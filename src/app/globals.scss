@@ -1,0 +1,56 @@
+body{
+  margin: 0px;
+  background-color: #FFF9F4;
+}
+.hp-nav{
+  background-color: #C07767;
+  height: 30px;
+}
+.signup-img{
+  height: 10px;
+  width: 10px;
+}
+.sidebar{
+  text-indent: 10px;
+  color: #ffff;
+  background-color: #C07767;
+  display: flex;
+  height: 100vh;
+  width: 256px;
+  flex-direction: column;
+  border-radius: 0px 10px 10px 0px;
+  ul li{
+    list-style: none;
+    margin: 10px;
+  }
+}
+.pages-container {
+  display: flex;
+  .main{
+    display: flex;
+    flex-direction: column;
+    flex:auto;
+  }
+}
+
+.addEvent-sidebar{
+  width: 300px;
+  display: none;
+  position: absolute;
+  &.show{
+    display: block;
+    transform: translateX(0);
+  }
+
+}
+
+// .project-list{
+//   display: flex;
+//   border: solid 1px #C07767;
+// }
+// .project-member{
+//   display: flex;
+//   margin: 5px;
+//   height: auto;
+//   border: solid 1px #C07767;
+// }
