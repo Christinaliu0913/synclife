@@ -1,8 +1,7 @@
 "use client"
 
 import ProjectList from "@/app/component/project/1_projectList";
-import AddProject from "./1_addProjectbutton";
-import ProjectContent from "./2_projectContent";
+import AddProject from "./1_addProject";
 import { useAuth } from '../auth/authContext';
 import { useEffect, useState } from "react";
 import { auth, db } from '../../../../firebase';
@@ -19,7 +18,7 @@ const ProjectMain = () => {
             console.log('currentUser:', currentUser);
             if(!loadingUser && currentUser){
                 try{
-                    const q = query(collection(db, 'project'), where('projectMember','in',[currentUser.email]));
+                    const q = query(collection(db, 'project'), where('projectMember','array-contains',currentUser.email));
                     const querySnapshot = await getDocs(q);
                     const currentUserProjects = querySnapshot.docs.map(doc => ({
                         id: doc.id,
@@ -44,6 +43,7 @@ const ProjectMain = () => {
 
     },[currentUser,loadingUser])
     
+    //刪除project
     const onDeleteProject = async(projectId:string) => {
         try{
             const projectDef = doc(db, 'project', projectId);
@@ -77,6 +77,7 @@ const ProjectMain = () => {
         
             {projects?.map(project => (
                 <ProjectList 
+                    key={project.id}
                     project={project}//傳入project的資料
                     OnDelete={()=>onDeleteProject(project.id)}
                     OnUpdate={handleUpdateProject}

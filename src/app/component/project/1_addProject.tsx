@@ -11,10 +11,13 @@ const AddProject = ({setProjects,projects}) => {
     const {currentUser,loadingUser} = useAuth();
     const projectTitle = '';
     const projectStatus = 'unstarted';
-    const projectMember = currentUser?.email;
+    const projectMember = currentUser ? [currentUser.email] : [];
     const projectDateStart = new Date().toISOString();//應該直接設置今天
     const projectDateEnd = '';
     const projectOwnner = currentUser?.email;
+
+    
+    
 
     //新增一個project
     const handleAddProject = async() =>{

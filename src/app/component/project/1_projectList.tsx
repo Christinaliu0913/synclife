@@ -1,17 +1,122 @@
-import {useState} from 'react';
-import ProjectContent from './2_projectContent';
-import AddCategory from "./3_addCategory";
-import { useAuth } from '../auth/authContext';
+import {useEffect, useState} from 'react';
+import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
+import AddCategory from "./2_addCategory";
+import { db } from '../../../../firebase';
+import CategoryContent from './2_categoryContent'
+import MemberList from './member/member_List'
 
-const ProjectList = ({project,OnDelete,OnUpdate}) => {
-    // 
+const ProjectList = ({key,project,OnDelete,OnUpdate}) => {
+    //set project資料 
     const [title, setTitle] = useState(project.projectTitle);
     const [status, setStatus] = useState(project.projectStatus);
-    const [member, setMember] = useState(project.projectMember);
+    const [members, setMembers] = useState(Array.isArray(project.projectMember) ? project.projectMember : [project.projectMember]); 
     const [startDate, setStartDate] = useState(project.projectDateStart?.slice(0,10));
     const [endDate, setEndDate] = useState(project.projectDateEnd?.slice(0,10));
-    console.log('有到這裡呦')
-    console.log('key?',project.id)
+
+    //category 資料
+    const [categories, setCategories] = useState([]);
+    console.log('checilllll',project.projectMember)
+    //members 資料
+    const [showMemberInput, setShowMemberInput] = useState(false)
+    const [newMember, setNewMember] = useState('');
+
+
+
+    
+    //fetch category的資料
+    useEffect(()=>{
+        const fetchCategories = async () => {
+            try{
+                const q = query(collection(db,`project/${project.id}/category`));
+                const querySnapshot = await getDocs(q);
+                const fetchedCategories = querySnapshot.docs.map(doc =>({
+                    id:doc.id,
+                    ...doc.data()
+                }));
+                if(fetchedCategories){
+                    setCategories(fetchedCategories);
+                    console.log('fetchedCategories',fetchedCategories)
+                }else{
+                    console.log('這個project沒有categories');
+                }
+            }catch(error){
+                console.log('獲取category出錯',error)
+            }
+
+        } 
+        fetchCategories()
+    },[project.id])
+        //----------------------- member 處理----------------------------
+    
+
+    //新增會員權限
+    const handleAddMember = async() => {
+        if(newMember && !members.includes(newMember) ){
+            try{
+                const newMemberRef = doc (db, 'project',project.id);
+                const updatedMembers = [...members, newMember];
+                await updateDoc(newMemberRef, {
+                    projectMember: updatedMembers
+                });
+
+                setMembers(updatedMembers);
+                setNewMember('');
+                setShowMemberInput(false);
+            } catch(error){
+                console.log('新增成員時出錯',error);
+            }
+           
+            
+
+        }
+    }
+
+    //刪除會員
+    const handleDeleteMember = async(memberToRemove:string) => {
+        try{
+            const updatedMembers = members.filter(member => member !== memberToRemove)
+            const newMemberRef = doc (db, 'project',project.id);
+            await updateDoc(newMemberRef, {
+                projectMember: updatedMembers
+            });
+            setMembers(updatedMembers);//更新local端
+        }catch(error){
+            console.log('刪除成員時出錯',error);
+        }
+    }
+    
+    //-----Category-------
+    //刪除Category
+    const onDeleteCategory = async(categoryId:string) => {
+        try{
+            const categoryDef = doc(db, `project/${project.id}/category/${categoryId}`);
+            await deleteDoc(categoryDef);
+            setCategories(prevCategories => prevCategories.filter(category => category.id !== categoryId))
+        }catch(error){
+            console.log('刪除category時錯誤',error)
+        }
+    }
+
+    //即時儲存更新category
+    const handleUpdateCategory = async(categoryId:string, updatedData:any) =>{
+        try{
+            const categoryDef = doc(db, `project/${project.id}/category/${categoryId}`);
+            await updateDoc(categoryDef, updatedData);
+            setCategories(prevCategories => prevCategories.map(category =>
+                category.id === categoryId ? { ...category, ...updatedData } : category
+            ));
+        }catch(error){
+            console.log('更新category時錯誤',error);
+        }
+
+    }
+
+
+    //console.log('有到這裡呦')
+    //console.log('key?',project.id)
+
+
+    //--------------------------編輯project內容---------------------------
     //編輯標題
     const handleTitleBlur = () =>  {
         OnUpdate(project.id, {projectTitle: title})
@@ -37,6 +142,7 @@ const ProjectList = ({project,OnDelete,OnUpdate}) => {
                 <div className='project-list'>
                     <div className='project-list-box'>
                         {/* Title */}
+                       
                         <input placeholder='title' value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}></input>
                         {/* Status */}
                         <select id="" value={status} onChange={(e) => setStatus(e.target.value)} onBlur={handleStatus}>
@@ -45,13 +151,45 @@ const ProjectList = ({project,OnDelete,OnUpdate}) => {
                             <option value="Processing">Processing</option>
                             <option value="Done">Done</option>
                         </select>
+
+
                         {/* Member !!!!這邊要另外處理member的部分*/}
+
+                        
+
+
                         <div className='project-member'>
                             <img className='signup-img' src="/images/google.png" alt="" />
                             <div>member</div>
-                            <button>+</button>
+                            {Array.isArray(members) && members.map((member) => (
+                                <MemberList
+                                    key={member} // 使用 member 作为 key 因为 member 是字符串
+                                    member={member}
+                                    OnDelete={() => handleDeleteMember(member)}
+                                />
+                            ))}
+                            <button onClick={()=> setShowMemberInput(true)}>+</button>
                         </div>
+                        {/* 加入新成員視窗 showMemberInput */}
 
+                        {showMemberInput? 
+                            (<div className={`project-addMember ${showMemberInput? 'show' : ''}`}>
+                                <div>
+                                    <div>Enter email to join your member</div>
+                                    <div>
+                                    <input type="text" placeholder='' value={newMember} onChange={(e) => setNewMember(e.target.value)}/>
+                                    </div>
+                                        <button onClick={handleAddMember}>Add</button>
+                                        
+                                </div>
+
+                            </div>) :
+                            (
+                                <div></div>
+                            )
+
+                        }
+                  
                         {/* Date */}
                         <input 
                             type = "date" 
@@ -75,7 +213,20 @@ const ProjectList = ({project,OnDelete,OnUpdate}) => {
 
                 </div>
                 <div className='project-content'>
-                    <ProjectContent/>
+                    
+                    {categories?.map(category => (
+                        <CategoryContent 
+                        key={category.id}
+                        category={category}
+                        OnDelete={()=>onDeleteCategory(category.id)}
+                        OnUpdate={handleUpdateCategory}
+                    />
+                    ))}
+                    <AddCategory
+                        projectId={project.id}
+                        setCategories={setCategories}
+                        categories={categories}
+                    />
                 </div>
             </div>
            
