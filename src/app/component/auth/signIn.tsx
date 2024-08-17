@@ -50,7 +50,7 @@ const SignIn = () =>{
         <>
             {currentUser ? (
                 <div>  
-                    <button onClick={()=>window.location.href='/pages'}
+                    <button onClick={()=>router.push('/pages')}
                     >start!</button>
                 </div>
                 ) 
