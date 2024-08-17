@@ -8,7 +8,7 @@ import { signOut } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import  SignOut from './signOut'
 import  Cookies  from  "js-cookie";
-
+import Image from "next/image";
 
 
 
@@ -56,7 +56,7 @@ const SignIn = () =>{
                 ) 
                 : 
                 (<button onClick={signWithGoogle}>
-                    <img className='signup-img'src='images/google.png'></img> Continue with Google
+                    <Image className='signup-img'src='/images/google.png' alt="SignIn" width={20} height={20}/>Continue with Google
                 </button>)
             } 
             {currentUser ? (

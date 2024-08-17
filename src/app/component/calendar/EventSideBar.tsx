@@ -78,7 +78,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             }
         
         }
-    },[selectedStartTime,allDay])
+    },[selectedStartTime,selectedEndTime,allDay,checkAllDay,events])
 
     //新增到google calendar上
     const handleSave = async() => {

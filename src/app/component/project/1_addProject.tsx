@@ -1,20 +1,37 @@
-
-import AddProjectPanel from "./2_addProjectButtonPanel";
+import { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react'
 import { auth, db } from '../../../../firebase';
 import { collection, doc, setDoc} from 'firebase/firestore';
 import { useAuth } from '../auth/authContext';
 import Image from "next/image";
 
-const AddProject = ({setProjects,projects}) => {
+
+interface Project {
+    id: string;
+    uid: string;
+    projectTitle: string;
+    projectStatus: string;
+    projectMember: string[];
+    projectDateStart: string;
+    projectDateEnd: string;
+    projectOwnner: string | undefined;
+    createdAt: string;
+}
+
+interface AddProjectProps {
+setProjects: Dispatch<SetStateAction<Project[]>>;
+projects: Project[];
+}
+
+const AddProject: React.FC<AddProjectProps> = ({setProjects,projects}) => {
     
     const {currentUser,loadingUser} = useAuth();
     const projectTitle = '';
     const projectStatus = 'unstarted';
-    const projectMember = currentUser ? [currentUser.email] : [];
+    const projectMember: string[] = currentUser && currentUser.email ? [currentUser.email] : [];
     const projectDateStart = new Date().toISOString();//應該直接設置今天
     const projectDateEnd = '';
-    const projectOwnner = currentUser?.email;
+    const projectOwnner: string | undefined = currentUser?.email ?? undefined;
 
     
     
@@ -38,7 +55,7 @@ const AddProject = ({setProjects,projects}) => {
                 await setDoc(newDocRef, newProject)
                 console.log('已新增一個Project了', newDocRef.id)
 
-                setProjects(projects=> (projects? [...projects,{id:newDocRef.id,...newProject}]: [{id:newDocRef.id, ...newProject}]))
+                setProjects([...projects, { id: newDocRef.id, ...newProject }]);
             }
             console.log('no currentUser')
         }

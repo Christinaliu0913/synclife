@@ -6,7 +6,25 @@ import CategoryContent from './2_categoryContent'
 import MemberList from './member/member_List'
 import Image from 'next/image';
 
-const ProjectList = ({key,project,OnDelete,OnUpdate}) => {
+interface Project {
+    id: string;
+    uid: string;
+    projectTitle: string;
+    projectStatus: string;
+    projectMember: string[];
+    projectDateStart: string;
+    projectDateEnd: string;
+    projectOwnner: string | undefined;
+    createdAt: string;
+}
+
+interface ProjectListProps {
+    project: Project;
+    OnDelete: () => void;
+    OnUpdate: (id: string, updatedData: Partial<Project>) => void;
+}
+
+const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) => {
     //set project資料 
     const [title, setTitle] = useState(project.projectTitle);
     const [status, setStatus] = useState(project.projectStatus);
@@ -15,7 +33,7 @@ const ProjectList = ({key,project,OnDelete,OnUpdate}) => {
     const [endDate, setEndDate] = useState(project.projectDateEnd?.slice(0,10));
 
     //category 資料
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<any[]>([]); 
     console.log('checilllll',project.projectMember)
     //members 資料
     const [showMemberInput, setShowMemberInput] = useState(false)

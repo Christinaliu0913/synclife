@@ -1,7 +1,7 @@
 'use client'
 import { useAuth } from '../auth/authContext';
 import SignOut from '../auth/signOut'
-
+import Image from 'next/image';
 
 const Navigation = () => {
     const {currentUser} = useAuth();
@@ -17,15 +17,15 @@ const Navigation = () => {
                 </div>
                 <div className='menu'>
                     <ul>
-                        <li><img src="/images/Date_today.png" alt="" /><a href="/pages">Calendar</a> </li>
+                        <li><Image src="/images/Date_today.png" alt="Description" width={20} height={20} /><a href="/pages">Calendar</a> </li>
                         <li>
-                            <span><img src="/images/check-contained.png" alt="" /> To do list</span> 
+                            <span><Image src="/images/check-contained.png" alt="Description" width={20} height={20} /> To do list</span> 
                             <ul className='sub-menu-project'>
                               <li>test</li>
                             </ul>
                         </li>
                         <li>
-                            <span><img src="/images/Folder_light.png" alt="" /><a href="/pages/project">Project</a></span> 
+                            <span><Image src="/images/Folder_light.png" alt="Description" width={20} height={20} /><a href="/pages/project">Project</a></span> 
                             <ul className='sub-menu-project'>
                                 <li>test</li>
                             </ul>

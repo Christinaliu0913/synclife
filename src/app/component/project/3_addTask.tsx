@@ -2,18 +2,36 @@ import { auth, db } from '../../../../firebase';
 import { collection, doc, setDoc} from 'firebase/firestore';
 import { useAuth } from '../auth/authContext';
 import Image from 'next/image';
+import { Dispatch, SetStateAction } from 'react';
+
+interface Task {
+    id: string;
+    taskTitle: string;
+    taskStatus: string;
+    taskAssign: string;
+    taskDate: string;
+    taskDescription: string;
+    taskOwnner: string | null;
+    projectId: string;
+    createdAt: string;  
+}
+
+interface AddTaskProps {
+    categoryId: string;
+    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+    tasks: Task[];
+    projectId: string;
+}
 
 
-
-const AddTask = ({categoryId,setTasks,tasks,projectId}) => {
+const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) => {
     const {currentUser,loadingUser} = useAuth();
     const taskTitle = '';
     const taskStatus = 'unstarted';
     const taskAssign = '';
     const taskDescription = '';
     const taskDate = new Date().toISOString();//應該直接設置今天
-    const taskOwnner = currentUser?.email;
-    
+    const taskOwnner: string | null = currentUser?.email ?? null; 
     
     console.log('checasdfasdfadfilllll',projectId)
     
@@ -23,9 +41,8 @@ const AddTask = ({categoryId,setTasks,tasks,projectId}) => {
         if(!loadingUser){
             if(currentUser){
                 const newDocRef = doc(collection(db, `project/${projectId}/category/${categoryId}/task`));
-                const newTask = {
-                    uid:
-                        currentUser.uid,
+                const newTask:Task = {
+                    id: newDocRef.id,
                         taskTitle,
                         taskStatus,
                         taskAssign,
@@ -38,7 +55,7 @@ const AddTask = ({categoryId,setTasks,tasks,projectId}) => {
                 await setDoc(newDocRef, newTask)
                 console.log('已新增一個task了', newDocRef.id,`project/${projectId}/category/${categoryId}/task`)
 
-                setTasks(tasks=> (tasks? [...tasks,{id:newDocRef.id,...newTask}]: [{id:newDocRef.id, ...newTask}]));
+                setTasks(tasks => (tasks ? [...tasks, newTask] : [newTask]));
             }
             console.log('no currentUser')
         }

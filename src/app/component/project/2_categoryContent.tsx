@@ -4,10 +4,35 @@ import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'fir
 import { db } from '../../../../firebase';
 import AddTask from "./3_addTask";
 
-const CategoryContent = ({key,category,OnDelete,OnUpdate}) => {
+interface Category {
+    id: string;
+    projectId: string;
+    categoryTitle: string;
+}
+
+interface Task {
+    id: string;
+    taskTitle: string;
+    taskStatus: string;
+    taskAssign: string;
+    taskDate: string;
+    taskDescription: string;
+    taskOwnner: string | null;
+    projectId: string;
+    createdAt: string;  
+}
+
+interface CategoryContentProps {
+    key: string;
+    category: Category;
+    OnDelete: () => void;
+    OnUpdate: (categoryId: string, updatedData: Partial<Category>) => void;
+}
+
+const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,OnUpdate}) => {
     const [title, setTitle] = useState(category.categoryTitle)
     //task
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
     const projectId = category.projectId;
     console.log('checkthis!!!',projectId) 
     console.log('task',tasks)   
@@ -18,9 +43,9 @@ const CategoryContent = ({key,category,OnDelete,OnUpdate}) => {
             try{
                 const q = query(collection(db, `project/${projectId}/category/${category.id}/task`));
                 const querySnapshot = await getDocs(q);
-                const fetchedTasks = querySnapshot.docs.map(doc =>({
-                    id: doc.id,
-                    ...doc.data()
+                const fetchedTasks: Task[] = querySnapshot.docs.map(doc =>({
+                    ...doc.data() as Task,
+                    id: doc.id
                 }));
                 if(fetchedTasks){
                     setTasks(fetchedTasks);
@@ -33,7 +58,7 @@ const CategoryContent = ({key,category,OnDelete,OnUpdate}) => {
             }
         }
         fetchTasks();
-    },[])
+    },[projectId, category.id])
 
     //-----編輯Category----
     const handleTitleBlur = () =>{

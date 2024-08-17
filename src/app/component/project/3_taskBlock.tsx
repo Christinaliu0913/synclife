@@ -1,6 +1,22 @@
 import { useState } from 'react'
 
-const TaskBlock = ({key,task,OnDelete,OnUpdate}) => {
+interface Task {
+    id: string;
+    taskTitle: string;
+    taskStatus: string;
+    taskAssign: string;
+    taskDate: string;
+    taskDescription: string;
+}
+
+interface TaskBlockProps {
+    task: Task;
+    OnDelete: (taskId: string) => void;
+    OnUpdate: (taskId: string, updatedTask: Partial<Task>) => void;
+}
+
+
+const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate}) => {
     const [title, setTitle] = useState(task.taskTitle);
     const [status, setStatus] = useState(task.taskStatus);
     const [assign, setAssign] = useState(task.taskAssign);
@@ -55,7 +71,7 @@ const TaskBlock = ({key,task,OnDelete,OnUpdate}) => {
             {/* asign這邊應該要在加入一個組件 */}
             <div>
                 <label htmlFor="assign">Assign</label>
-                <button>add</button>
+                <button >add</button>
             </div>
 
             

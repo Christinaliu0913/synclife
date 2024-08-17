@@ -1,7 +1,14 @@
  "use client"
 import { useState } from 'react';
+import { FC } from 'react';
 
-const MemberList = ({member,OnDelete}) => {
+interface MemberListProps {
+    member: string;
+    OnDelete: () => void;
+}
+
+
+const MemberList: FC<MemberListProps> = ({member,OnDelete}) => {
     //視窗是否出現
     //key, member, setShowMemberInput, onAddMember
     //新增project成員

@@ -13,6 +13,15 @@ const useGoogleCalendarAPI = () => {
             try{
                 gapi.load('client',()=>{
                     gapi.client.setToken({access_token:token});
+                    const initClient = async() => {
+                        gapi.client.init({
+                            discoveryDocs:["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+                        }).then(() => {
+                            readEvent();
+                        }).catch((error:any)=>{
+                            console.log('initClient的錯誤', error);
+                        });
+                    } ;
                     initClient();
                     console.log('有跑到這裡')
                 })
@@ -27,15 +36,15 @@ const useGoogleCalendarAPI = () => {
         
     
       
-    const initClient = () => {
-        gapi.client.init({
-            discoveryDocs:["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-        }).then(() => {
-            readEvent();
-        }).catch((error:any)=>{
-            console.log('initClient的錯誤', error);
-        });
-    }
+    // const initClient = () => {
+    //     gapi.client.init({
+    //         discoveryDocs:["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+    //     }).then(() => {
+    //         readEvent();
+    //     }).catch((error:any)=>{
+    //         console.log('initClient的錯誤', error);
+    //     });
+    // }
     
     const readEvent = async () =>{
         try{

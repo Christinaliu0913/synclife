@@ -1,11 +1,27 @@
-
+import { Dispatch, SetStateAction } from 'react';
 import { useAuth } from '../auth/authContext';
 import { auth, db } from '../../../../firebase';
 import { collection, doc, setDoc} from 'firebase/firestore';
 import { useState } from 'react'
 import Image from 'next/image';
 
-const AddCategory = ({projectId, setCategories, categories}) => {
+interface Category {
+    id: string;
+    uid: string;
+    categoryTitle: string;
+    createAt: string;
+    projectId: string;
+}
+
+
+interface AddCategoryProps {
+    projectId: string;
+    setCategories: Dispatch<SetStateAction<Category[]>>;
+    categories: Category[];
+}
+
+
+const AddCategory:React.FC<AddCategoryProps>= ({projectId, setCategories, categories}) => {
     const {currentUser,loadingUser} = useAuth();
     const categoryTitle  = '';
 

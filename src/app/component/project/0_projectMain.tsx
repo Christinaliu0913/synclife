@@ -1,5 +1,5 @@
 "use client"
-
+import { Dispatch, SetStateAction } from 'react';
 import ProjectList from "@/app/component/project/1_projectList";
 import AddProject from "./1_addProject";
 import { useAuth } from '../auth/authContext';
@@ -7,9 +7,26 @@ import { useEffect, useState } from "react";
 import { auth, db } from '../../../../firebase';
 import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
 
+interface Project {
+    id: string;
+    uid: string;
+    projectTitle: string;
+    projectStatus: string;
+    projectMember: string[];
+    projectDateStart: string;
+    projectDateEnd: string;
+    projectOwnner: string | undefined;
+    createdAt: string;
+}
+
+
+interface AddProjectProps {
+    setProjects: Dispatch<SetStateAction<Project[]>>;  
+    projects: Project[];
+}
 const ProjectMain = () => {
     const { currentUser,loadingUser } = useAuth();
-    const [ projects, setProjects ] = useState<any[]| null>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
 
     //先fetch這個人的資料
     useEffect(()=>{
@@ -23,7 +40,7 @@ const ProjectMain = () => {
                     const currentUserProjects = querySnapshot.docs.map(doc => ({
                         id: doc.id,
                         ...doc.data()
-                    }));
+                    } as Project));
                     if(currentUserProjects){
                         setProjects(currentUserProjects);
                         console.log('這個人的project有', currentUserProjects);
@@ -55,7 +72,7 @@ const ProjectMain = () => {
     };
    
     //更新project的內容
-    const handleUpdateProject = async(projectId:string, updatedData:any) => {
+    const handleUpdateProject = async(projectId:string, updatedData: Partial<Project>) => {
         try{
             const projectDef = doc(db, 'project', projectId);
             await updateDoc(projectDef, updatedData);
