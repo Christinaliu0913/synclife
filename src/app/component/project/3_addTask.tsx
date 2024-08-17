@@ -1,6 +1,7 @@
 import { auth, db } from '../../../../firebase';
 import { collection, doc, setDoc} from 'firebase/firestore';
 import { useAuth } from '../auth/authContext';
+import Image from 'next/image';
 
 
 
@@ -46,7 +47,7 @@ const AddTask = ({categoryId,setTasks,tasks,projectId}) => {
     return (
         <>
             <button onClick={handleAddTask}>
-            <img src="/images/add.png" alt="" />
+            <Image src="/images/add.png" alt="Add Task" width={20} height={20} />
             Add Task
             </button>
         </>

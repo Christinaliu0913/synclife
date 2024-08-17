@@ -48,7 +48,7 @@ const ProjectMain = () => {
         try{
             const projectDef = doc(db, 'project', projectId);
             await deleteDoc(projectDef);
-            setProjects(prevProjects => prevProjects.filter(project=>project.id !==  projectId))
+            setProjects(prevProjects =>(prevProjects ?? []).filter(project=>project.id !==  projectId))
         }catch(error){
             console.log('刪除project內容時錯誤',error);
         }
@@ -60,7 +60,7 @@ const ProjectMain = () => {
             const projectDef = doc(db, 'project', projectId);
             await updateDoc(projectDef, updatedData);
             // !!!!--------> 這邊要處理沒有preProjects的邏輯
-            setProjects(prevProjects => prevProjects.map(project => 
+            setProjects(prevProjects => (prevProjects ?? []).map(project => 
                 project.id === projectId ? { ...project, ...updatedData } : project
             ));
 

@@ -4,6 +4,7 @@ import AddCategory from "./2_addCategory";
 import { db } from '../../../../firebase';
 import CategoryContent from './2_categoryContent'
 import MemberList from './member/member_List'
+import Image from 'next/image';
 
 const ProjectList = ({key,project,OnDelete,OnUpdate}) => {
     //set project資料 
@@ -159,7 +160,7 @@ const ProjectList = ({key,project,OnDelete,OnUpdate}) => {
 
 
                         <div className='project-member'>
-                            <img className='signup-img' src="/images/google.png" alt="" />
+                            <Image className='signup-img' src="/images/google.png" alt="Add Task" width={20} height={20}/>
                             <div>member</div>
                             {Array.isArray(members) && members.map((member) => (
                                 <MemberList

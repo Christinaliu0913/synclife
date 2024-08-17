@@ -3,6 +3,7 @@ import { useAuth } from '../auth/authContext';
 import { auth, db } from '../../../../firebase';
 import { collection, doc, setDoc} from 'firebase/firestore';
 import { useState } from 'react'
+import Image from 'next/image';
 
 const AddCategory = ({projectId, setCategories, categories}) => {
     const {currentUser,loadingUser} = useAuth();
@@ -34,7 +35,7 @@ const AddCategory = ({projectId, setCategories, categories}) => {
 
     <> 
     <button onClick={handleAddCategory}>
-        <img src="/images/add.png" alt="" />Add Category
+        <Image src="/images/add.png" alt="Add Task" width={20} height={20} />Add Category
     </button>
     </>
     )
