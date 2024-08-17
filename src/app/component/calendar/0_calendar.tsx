@@ -1,6 +1,6 @@
 
 import Cookies from 'js-cookie';
-import FullCalendar from '@fullcalendar/react'
+import dynamic from 'next/dynamic';
 import dayGridPlugin from '@fullcalendar/daygrid' //月、年
 import timeGridPlugin from '@fullcalendar/timegrid';//週、日
 import interactionPlugin from '@fullcalendar/interaction'
@@ -13,7 +13,12 @@ import useGoogleCalendarAPI from '../calendar/1_useGoogleCalendarAPI';
 import EventSideBar from './EventSideBar';
 import { info } from 'console';
 
-const Calendar = () =>{
+
+const Calendar = dynamic(() => import("@fullcalendar/react"), {
+    ssr: false,
+  });
+
+const CalendarComponent = () =>{
     const googleEvents = useGoogleCalendarAPI();
     const [events, setEvents] = useState<any[]|null>([]);
     
@@ -26,12 +31,12 @@ const Calendar = () =>{
 
 
     useEffect(() => {
-        const test = () => {
+        if (typeof window !== 'undefined') {
             if (googleEvents.length > 0) {
                 setEvents(googleEvents); // 当googleEvents获取到数据时，更新events
             }
         }
-        test();
+        
         
     }, [googleEvents]);
     
@@ -59,7 +64,7 @@ const Calendar = () =>{
 
     return (
         <>
-         <FullCalendar
+         <Calendar
             plugins={[dayGridPlugin,timeGridPlugin,interactionPlugin,listPlugin]}
             initialView='timeGridWeek'//初始視圖
             headerToolbar={{
@@ -115,7 +120,7 @@ const Calendar = () =>{
     )
 }
 
-export default Calendar;
+export default CalendarComponent;
 
                     
 
