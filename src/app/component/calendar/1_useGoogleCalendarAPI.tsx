@@ -33,18 +33,6 @@ const useGoogleCalendarAPI = () => {
         }
     },[token])
    
-        
-    
-      
-    // const initClient = () => {
-    //     gapi.client.init({
-    //         discoveryDocs:["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-    //     }).then(() => {
-    //         readEvent();
-    //     }).catch((error:any)=>{
-    //         console.log('initClient的錯誤', error);
-    //     });
-    // }
     
     const readEvent = async () =>{
         try{

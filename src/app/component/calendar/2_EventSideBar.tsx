@@ -10,12 +10,17 @@ interface EventSideBarProps{
     events: any[]|null;//當前事件的列表
     allDay:boolean;
     //selectedDate: string | null;
+    selectedEvent: any|null;
+    selectedEventId: string|null;
     selectedStartTime: string | null;
     selectedEndTime: string | null;
+    OnUpdate:(addedEvent:any)=> void;
+    Ondelete:(addedEvent:any)=> void;
 }
 
 interface EventData {
     title: string;
+    id: string|null;
     start: string;
     end: string;
     checkAllDay: boolean;
@@ -31,8 +36,13 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     setEvents,
     events,
     allDay,
+    selectedEvent,
+    selectedEventId,
     selectedStartTime,
-    selectedEndTime}) => {
+    selectedEndTime,
+    OnUpdate,
+    Ondelete
+    }) => {
     //要新增使用者目前滑鼠所點到的位置
     
     
@@ -47,56 +57,63 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     const [clientPosition, setClientPosition] = useState({x:0, y:0});
 
     useEffect(()=>{
-        console.log('確認確認',events)
-        if(selectedStartTime){
-            let startDateTime = new Date(selectedStartTime);
-            let endDateTime = selectedEndTime ? new Date(selectedEndTime) : new Date(selectedStartTime);
+        if(selectedEvent){
+            
+            setTitle(selectedEvent.title || null);
+            setStart(selectedStartTime || '');
+            setEnd(selectedEndTime || '');
             setCheckAllDay(allDay);
-            console.log('有傳道這裡碼？',endDateTime)
-            console.log('checkaooday',checkAllDay)
+            setCalendar("primary");
+            setDescription(selectedEvent.description || '');
+            setProject(selectedEvent.project || 'default');
+
+        }else if(selectedStartTime){
+            let endDateTime = selectedEndTime ? selectedEndTime : selectedStartTime;
+            setCheckAllDay(allDay);
+            setTitle('');
             if(allDay){
-                const formattedStart = startDateTime.toISOString().slice(0,10);//只選選到時間的前10個字->年月日0000-00-00
-                const formattedEnd = endDateTime.toISOString().slice(0,10);
-                console.log('這裡',formattedStart)
+                const formattedStart = selectedStartTime.slice(0,10);
+                const formattedEnd = endDateTime.slice(0,10);
+                
                 setStart(formattedStart);
                 setEnd(formattedEnd);
 
-            }else{
-                //非全天
-                //設定加一小
-                // endDateTime.setHours(endDateTime.getHours() + 1);
-               
-
-                const formattedStartDateTime = startDateTime.toISOString().slice(0,16);
-                console.log(formattedStartDateTime)
-
-                const formattedEndDateTime = endDateTime.toISOString().slice(0,16);
-                console.log(formattedEndDateTime)
-
-                setStart(formattedStartDateTime);
-                setEnd(formattedEndDateTime);
+            }else{//如果不是allday
+                setStart(selectedStartTime);
+                setEnd(endDateTime);
             }
         
         }
-    },[selectedStartTime,selectedEndTime,allDay,checkAllDay,events])
+    },[selectedEvent,selectedStartTime,selectedEndTime,allDay])
 
     //新增到google calendar上
     const handleSave = async() => {
-        const newEventData : EventData ={title, start, end, checkAllDay, calendar, description, project};
-        const addedEvent = await addEventToGoogleCalendar(newEventData)//將資料傳給google
-        if(addedEvent){
-            setEvents((events)=> (events? [...events,addedEvent]:[addedEvent]))
+        const newEventData : EventData ={title, start, end, checkAllDay, calendar, description, project, id: selectedEventId? selectedEventId:null};
+        console.log('newEventData',newEventData)
+        try{
+
+            const addedEvent = await addEventToGoogleCalendar(newEventData);//將資料傳給google
+
+            if(addedEvent){
+               // setEvents((events)=> (events? [...events,addedEvent]:[addedEvent]))
+                OnUpdate(addedEvent);
+            }
+
             //清除表單資料
             setTitle('');
             setStart('');
             setEnd('');
             setCalendar('');
-            setDescription('')
-        }
-       
-        onClose();//儲存資料後關閉視窗
+            setDescription('');
 
-    }
+            //儲存資料後關閉視窗
+            onClose();
+
+        }catch(error){
+            console.log('新增日曆時出錯',error);
+        }
+
+    };
 
    const handleAllDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCheckAllDay(e.target.checked);
@@ -160,7 +177,10 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             </div>
             {/*  */}
             <button onClick={onClose}>Cancel</button>
-            <button onClick={handleSave}>Save</button>
+            <button onClick={handleSave} >Save</button>
+            {selectedEventId &&(
+                <button onClick={Ondelete}>Delete</button>
+            )}
         </div>
         </div>
         </>

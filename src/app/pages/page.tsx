@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-const Calendar = dynamic(() => import("../component/calendar/0_calendar"), {
+const CalendarComponent = dynamic(() => import("../component/calendar/0_calendar"), {
   ssr: false,
 });
 
@@ -11,7 +11,7 @@ const Project = () => {
     <div className="main">
       <div></div>
       <div>
-        <Calendar />
+        <CalendarComponent />
       </div>
     </div>
   ); 
