@@ -15,7 +15,7 @@ interface Project {
     projectMember: string[];
     projectDateStart: string;
     projectDateEnd: string;
-    projectOwnner: string | undefined;
+    projectOwner: string | undefined;
     createdAt: string;
 }
 
@@ -101,7 +101,7 @@ const ProjectMain = () => {
                 />
             ))}
             
-            <AddProject setProjects={setProjects} projects={projects} />
+            <AddProject setProjects={setProjects}  projects={projects}  />
             
 
         </>

@@ -14,7 +14,7 @@ interface Project {
     projectMember: string[];
     projectDateStart: string;
     projectDateEnd: string;
-    projectOwnner: string | undefined;
+    projectOwner: string | undefined;
     createdAt: string;
 }
 
@@ -31,7 +31,6 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
     const [members, setMembers] = useState(Array.isArray(project.projectMember) ? project.projectMember : [project.projectMember]); 
     const [startDate, setStartDate] = useState(project.projectDateStart?.slice(0,10));
     const [endDate, setEndDate] = useState(project.projectDateEnd?.slice(0,10));
-
     //category 資料
     const [categories, setCategories] = useState<any[]>([]); 
     console.log('checilllll',project.projectMember)

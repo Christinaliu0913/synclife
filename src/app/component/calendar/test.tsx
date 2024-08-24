@@ -6,9 +6,14 @@ import timeGridPlugin from '@fullcalendar/timegrid';//週、日
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list';//列表視圖
 import { useState, useEffect, useRef } from 'react'
+import { useAuth } from '../auth/authContext';
 import { gapi } from 'gapi-script';
+import { discovery } from 'googleapis/build/src/apis/discovery';
 import useGoogleCalendarAPI from '../calendar/1_useGoogleCalendarAPI';
 import EventSideBar from './2_EventSideBar';
+import { info } from 'console';
+import { CalendarApi } from '@fullcalendar/core';
+import FullCalendar from '@fullcalendar/react';
 import addEventToGoogleCalendar from './2_addNewEvent';
 import readEvent from './3_readEvent';
 
@@ -16,7 +21,7 @@ const Calendar = dynamic(() => import("@fullcalendar/react"), {
     ssr: false,
   });
 
-const CalendarComponent = () =>{
+const CalendarComponentTest = () =>{
     //events
     const googleEvents = useGoogleCalendarAPI();
     const [events, setEvents] = useState<any[]|null>([]);
@@ -24,7 +29,7 @@ const CalendarComponent = () =>{
     const [sideBarVisible, setsideBarVisible] = useState(false);
     //傳入在fullcalendar上面所點選的event or 時間段
     const [selectedEvent, setSelectedEvent] = useState<any|null>(null);
-    const [selectedEventId, setSelectedEventId] =useState<string>('');
+    const [selectedEventId, setSelectedEventId] =useState<string|null>(null);
     const [selectedEndTime, setSelectedEndTime] = useState<string|null>(null);
     const [selectedStartTime, setSelectedStartedTime] = useState<string|null>(null);
     const [allDay,setAllDay] = useState(false);
@@ -74,7 +79,7 @@ const CalendarComponent = () =>{
     //重置選中的事件數據
     const resetEventData = () => {
         setSelectedEvent(null);
-        setSelectedEventId('');
+        setSelectedEventId(null);
         setSelectedStartedTime(null);
         setSelectedEndTime(null);
         setAllDay(false);
@@ -256,6 +261,7 @@ const CalendarComponent = () =>{
     )
 }
 
-export default CalendarComponent;
+export default CalendarComponentTest;
 
                     
+

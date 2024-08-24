@@ -1,13 +1,10 @@
 'use client'
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { auth, googleProvider} from '../../../../firebase'
-import { GoogleAuthProvider } from "firebase/auth/web-extension";
 import { signInWithPopup} from 'firebase/auth'
 import { useAuth } from '../auth/authContext'
-import { signOut } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import  SignOut from './signOut'
-import  Cookies  from  "js-cookie";
 import Image from "next/image";
 
 
@@ -27,18 +24,8 @@ const SignIn = () =>{
 
     const signWithGoogle = async() => {
         try{
-            //添加Google calendar的權限
-            googleProvider.addScope('https://www.googleapis.com/auth/calendar');
             const result = await signInWithPopup(auth, googleProvider);
-            const credential = GoogleAuthProvider.credentialFromResult(result)
-            const token = credential?.accessToken;
-            console.log('loged in!');
-            console.log('OAuth Token', token)
-            if(token){
-               Cookies.set('googleToken',token, {expires:7,path:'/'});
-            }
-            
-            // const token = result.user.accessToken
+            console.log('登入資訊',result)
         }catch(error){
             console.error('error loggin in with Goolge:',error);
         }

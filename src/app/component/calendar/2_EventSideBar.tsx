@@ -1,6 +1,25 @@
 "use client"
 import {use, useEffect, useRef, useState} from 'react';
 import addEventToGoogleCalendar from './2_addNewEvent';
+import { gapi } from 'gapi-script';
+import readEvent from './3_readEvent';
+import ProjectOption from './4_projectOption';
+import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
+import { auth, db } from '../../../../firebase';
+import { useAuth } from '../auth/authContext';
+import AddorEditProjectTask from './3_addprojectTask';
+
+interface Project {
+    id: string;
+    uid: string;
+    projectTitle: string;
+    projectStatus: string;
+    projectMember: string[];
+    projectDateStart: string;
+    projectDateEnd: string;
+    projectOwner: string | undefined;
+    createdAt: string;
+}
 
 interface EventSideBarProps{
     show: boolean;
@@ -11,10 +30,9 @@ interface EventSideBarProps{
     allDay:boolean;
     //selectedDate: string | null;
     selectedEvent: any|null;
-    selectedEventId: string|null;
+    selectedEventId: string;
     selectedStartTime: string | null;
     selectedEndTime: string | null;
-    OnUpdate:(addedEvent:any)=> void;
     Ondelete:(addedEvent:any)=> void;
 }
 
@@ -40,33 +58,37 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     selectedEventId,
     selectedStartTime,
     selectedEndTime,
-    OnUpdate,
     Ondelete
     }) => {
     //要新增使用者目前滑鼠所點到的位置
-    
-    
+    const [clientPosition, setClientPosition] = useState({x:0, y:0});
+    //所選到的event資料
+    const [calendarId, setCalendarId] = useState('')
     const [title, setTitle] = useState('');
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
     const [checkAllDay, setCheckAllDay] = useState(true);
-    const [calendar, setCalendar] = useState('default');
+    const [calendar, setCalendar] = useState('');
     const [description, setDescription] = useState('')
     const [project, setProject] = useState('')
- 
-    const [clientPosition, setClientPosition] = useState({x:0, y:0});
-
+    //目前使用者資料
+    const { currentUser,loadingUser } = useAuth();
+    //Project資料
+    const [projects, setProjects] = useState<Project[]>([]);
+    //處理選到evnet的資訊
     useEffect(()=>{
+        //確認選到event的內容
         if(selectedEvent){
-            
+            //如果有選到event的id的話
+            setCalendarId(selectedEventId)
             setTitle(selectedEvent.title || null);
             setStart(selectedStartTime || '');
             setEnd(selectedEndTime || '');
             setCheckAllDay(allDay);
             setCalendar("primary");
             setDescription(selectedEvent.description || '');
-            setProject(selectedEvent.project || 'default');
-
+            setProject(selectedEvent.project || '');
+        //如果沒有的話設定選到的時間
         }else if(selectedStartTime){
             let endDateTime = selectedEndTime ? selectedEndTime : selectedStartTime;
             setCheckAllDay(allDay);
@@ -86,25 +108,70 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
         }
     },[selectedEvent,selectedStartTime,selectedEndTime,allDay])
 
+    //先fetch這個人的project
+    useEffect(()=>{
+        const fetchProjects = async () => {
+            if(!loadingUser && currentUser){
+                try{
+                    const q = query(collection(db, 'project'), where('projectMember','array-contains',currentUser.email));
+                    const querySnapshot = await getDocs(q);
+                    const currentUserProjects = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    } as Project));
+                    if(currentUserProjects){
+                        setProjects(currentUserProjects);
+                        console.log('這個人的project有', currentUserProjects);
+                        
+                    }else{
+                        console.log('這個人沒有project')
+                    }
+                }catch(error){
+                    console.log('獲取項目出錯',error);
+                }
+            }
+        }
+        fetchProjects();
+    },[currentUser,loadingUser])
+
     //新增到google calendar上
     const handleSave = async() => {
-        const newEventData : EventData ={title, start, end, checkAllDay, calendar, description, project, id: selectedEventId? selectedEventId:null};
-        console.log('newEventData',newEventData)
+        const newEventData : EventData ={
+            title : title || '', 
+            start, 
+            end, 
+            checkAllDay, 
+            calendar: calendar || 'default', 
+            description, 
+            project, 
+            id: selectedEventId? selectedEventId : null
+        };
+        const endTimeSet = end.slice(0,10);
+        console.log('newEventData',newEventData);
+        
+
         try{
-
-            const addedEvent = await addEventToGoogleCalendar(newEventData);//將資料傳給google
-
+            console.log('cat創立',project)
+            await AddorEditProjectTask({ project, title, endTimeSet,calendarId,currentUser })
+            //將資料傳給google
+            const addedEvent = await addEventToGoogleCalendar(newEventData);
+            
             if(addedEvent){
-               // setEvents((events)=> (events? [...events,addedEvent]:[addedEvent]))
-                OnUpdate(addedEvent);
+                const renewEvents = await readEvent();
+                setEvents(renewEvents);
             }
-
+            
+            //把project的task存到firebase
+                //先新增一個cat
+                
+                //把task放到這個cat裡面
             //清除表單資料
             setTitle('');
             setStart('');
             setEnd('');
             setCalendar('');
             setDescription('');
+            setProject('');
 
             //儲存資料後關閉視窗
             onClose();
@@ -139,7 +206,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             
             <div>
                 <label htmlFor="allDay">All Day</label>
-                <input type="checkbox" id='allDay' checked={allDay} onChange={handleAllDayChange} placeholder='end time' />
+                <input type="checkbox" id='allDay' checked={checkAllDay} onChange={handleAllDayChange} placeholder='end time' />
             </div>
 
             <div>
@@ -169,7 +236,16 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
 
             <div>
                 <label htmlFor="project">Project</label>
-                <select id="project" value={project} onChange={(e)=>setCalendar(e.target.value)} >
+                <select id="project" value={project} onChange={(e)=>setProject(e.target.value)} >
+                    <option value=""></option>
+                    {projects?.map(project => (
+                     <ProjectOption
+                        key={project.id}
+                        project={project}
+                     />   
+                    )
+                    )}
+                    {/* <ProjectOption/> */}
                     <option value="default">test</option>
                     <option value="addNewProject">Add new project</option>
                     {/* 我這邊要另外做一個option的選項fetch */}

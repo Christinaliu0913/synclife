@@ -11,7 +11,8 @@ interface Task {
     taskAssign: string;
     taskDate: string;
     taskDescription: string;
-    taskOwnner: string | null;
+    taskOwner: string | null;
+    calendarId: string;
     projectId: string;
     createdAt: string;  
 }
@@ -31,7 +32,8 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
     const taskAssign = '';
     const taskDescription = '';
     const taskDate = new Date().toISOString();//應該直接設置今天
-    const taskOwnner: string | null = currentUser?.email ?? null; 
+    const taskOwner: string | null = currentUser?.email ?? null; 
+    const calendarId = '';
     
     console.log('checasdfasdfadfilllll',projectId)
     
@@ -48,7 +50,8 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
                         taskAssign,
                         taskDate,
                         taskDescription,
-                        taskOwnner,
+                        taskOwner,
+                        calendarId,
                         createdAt: new Date().toISOString(),
                         projectId: projectId
                 }

@@ -17,7 +17,8 @@ interface Task {
     taskAssign: string;
     taskDate: string;
     taskDescription: string;
-    taskOwnner: string | null;
+    taskOwner: string | null;
+    calendarId: string;
     projectId: string;
     createdAt: string;  
 }

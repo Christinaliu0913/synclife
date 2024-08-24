@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/component/calendar/3_addprojectTask.js", "src/app/component/calendar/3_addprojectTask.js"],
   "exclude": ["node_modules"]
 }

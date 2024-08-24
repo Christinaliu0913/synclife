@@ -10,6 +10,7 @@ const useGoogleCalendarAPI = () => {
 
     useEffect(()=>{
         if(token){
+            console.log('有跑這裡a;lkdjfa');
             try{
                 gapi.load('client',()=>{
                     gapi.client.setToken({access_token:token});
@@ -52,6 +53,7 @@ const useGoogleCalendarAPI = () => {
                         orderBy: 'startTime'
                     });
                     const events = eventResponse.result.items || [];
+                    
                     allEvents = [...allEvents,...events]
                     console.log('現在我想測試這個',allEvents)
             

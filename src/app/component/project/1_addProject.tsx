@@ -14,7 +14,7 @@ interface Project {
     projectMember: string[];
     projectDateStart: string;
     projectDateEnd: string;
-    projectOwnner: string | undefined;
+    projectOwner: string | undefined;
     createdAt: string;
 }
 
@@ -31,7 +31,7 @@ const AddProject: React.FC<AddProjectProps> = ({setProjects,projects}) => {
     const projectMember: string[] = currentUser && currentUser.email ? [currentUser.email] : [];
     const projectDateStart = new Date().toISOString();//應該直接設置今天
     const projectDateEnd = '';
-    const projectOwnner: string | undefined = currentUser?.email ?? undefined;
+    const projectOwner: string | undefined = currentUser?.email ?? undefined;
 
     
     
@@ -49,13 +49,14 @@ const AddProject: React.FC<AddProjectProps> = ({setProjects,projects}) => {
                         projectMember,
                         projectDateStart,
                         projectDateEnd,
-                        projectOwnner,
+                        projectOwner,
                         createdAt: new Date().toISOString()
                 }
                 await setDoc(newDocRef, newProject)
                 console.log('已新增一個Project了', newDocRef.id)
 
                 setProjects([...projects, { id: newDocRef.id, ...newProject }]);
+                
             }
             console.log('no currentUser')
         }

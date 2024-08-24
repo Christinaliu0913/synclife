@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic";
+import GoogleCalendarAuth from "../component/auth/googleCalendarAuth";
 
 const CalendarComponent = dynamic(() => import("../component/calendar/0_calendar"), {
   ssr: false,
@@ -9,9 +10,11 @@ const CalendarComponent = dynamic(() => import("../component/calendar/0_calendar
 const Project = () => {
   return (
     <div className="main">
-      <div></div>
       <div>
-        <CalendarComponent />
+        <GoogleCalendarAuth/>
+      </div>
+      <div>
+        <CalendarComponent/>
       </div>
     </div>
   ); 
