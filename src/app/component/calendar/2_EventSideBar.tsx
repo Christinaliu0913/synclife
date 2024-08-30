@@ -25,7 +25,7 @@ interface Project {
 interface EventSideBarProps{
     show: boolean;
     createNewProject: (project:string)=> void 
-    setEvents: React.Dispatch<React.SetStateAction<any[]|null>>;
+    setEvents: React.Dispatch<React.SetStateAction<any[]>>;
     events: any[]|null;//當前事件的列表
     tasks:any;
     allDay:boolean;

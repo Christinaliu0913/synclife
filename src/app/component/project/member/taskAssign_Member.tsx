@@ -97,8 +97,10 @@ const AssignMember:React.FC<AssignMemberProps> = ({taskId,projectId,categoryId,m
                 <div className="taskBlock-AssignList-Img"><Image className='task-memberImg' src="/images/projectMember.svg" alt="project status" width={20} height={20}/></div>
                     {assignedMembers ? (
                             assignedMembers.map((member, index) => (
-                                <div className="taskBlock-AssignMember">
-                                    <span key={index}>
+                                <div className="taskBlock-AssignMember"
+                                key={index}
+                                >
+                                    <span >
                                         {member}
                                     </span>
                                     <button onClick={() => handleDeleteMember(member)}>x</button>
@@ -117,8 +119,8 @@ const AssignMember:React.FC<AssignMemberProps> = ({taskId,projectId,categoryId,m
             {optionVisible? (
                 <select onChange={handleAssignMember}>
                     <option value="">Select a member</option>
-                    {notAssignedMembers?.map(member=>(
-                        <option value={member}>{member}</option>
+                    {notAssignedMembers?.map((member,index)=>(
+                        <option key={index} value={member}>{member}</option>
                     ))}
                 
                 </select>
