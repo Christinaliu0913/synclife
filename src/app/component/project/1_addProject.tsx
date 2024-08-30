@@ -68,8 +68,7 @@ const AddProject: React.FC<AddProjectProps> = ({setProjects,projects}) => {
     return(
         <> 
             <button className='project-addProject' onClick={handleAddProject}>
-                <Image src="/images/add.png" alt="Add Task" width={20} height={20} />
-                Add Project
+                <span>+</span>
             </button>
 
         </>

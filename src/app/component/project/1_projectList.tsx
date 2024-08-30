@@ -1,10 +1,12 @@
 import {useEffect, useState} from 'react';
-import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc,updateDoc, deleteDoc,getDoc } from 'firebase/firestore';
 import AddCategory from "./2_addCategory";
 import { db } from '../../../../firebase';
 import CategoryContent from './2_categoryContent'
 import MemberList from './member/member_List'
 import Image from 'next/image';
+
+import 'flatpickr/dist/themes/material_green.css'
 
 interface Project {
     id: string;
@@ -28,12 +30,16 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
     //set project資料 
     const [title, setTitle] = useState(project.projectTitle);
     const [status, setStatus] = useState(project.projectStatus);
+    //set members資料
     const [members, setMembers] = useState(Array.isArray(project.projectMember) ? project.projectMember : [project.projectMember]); 
-    const [startDate, setStartDate] = useState(project.projectDateStart?.slice(0,10));
-    const [endDate, setEndDate] = useState(project.projectDateEnd?.slice(0,10));
+    const [assignedMembers, setAssignedMembers] = useState<string[]>([]);
+    const [notAssignedMembers, setNotAssignedMembers] = useState<string[]>([]);
+    //set date資料
+    const [startDate, setStartDate] = useState(typeof project.projectDateStart === 'string' ? project.projectDateStart.slice(0, 10) : '');
+    const [endDate, setEndDate] = useState(typeof project.projectDateEnd === 'string' ? project.projectDateEnd.slice(0, 10) : '');
     //category 資料
     const [categories, setCategories] = useState<any[]>([]); 
-    console.log('checilllll',project.projectMember)
+   
     //members 資料
     const [showMemberInput, setShowMemberInput] = useState(false)
     const [newMember, setNewMember] = useState('');
@@ -89,7 +95,7 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
         }
     }
 
-    //刪除會員
+    //刪除會員並且把所有有包含這個Member的task中的assign member給移除
     const handleDeleteMember = async(memberToRemove:string) => {
         try{
             const updatedMembers = members.filter(member => member !== memberToRemove)
@@ -98,11 +104,46 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
                 projectMember: updatedMembers
             });
             setMembers(updatedMembers);//更新local端
+
+            //獲取這個project的所有task
+            const categorySnapshot = await getDocs(collection(db, `project/${project.id}/category`));
+            let tasks:any[] = [];
+            for (const categoryDoc of categorySnapshot.docs){
+                const categoryId = categoryDoc.id;
+                const taskSnapshot = await getDocs(collection(db,`project/${project.id}/category/${categoryId}/task`));
+                taskSnapshot.forEach(taskDoc => {
+                    tasks.push({taskId:taskDoc.id, categoryId});
+                })
+
+            }
+
+            //從每個任務的taskAssign 列表中移除該成員
+            for(const task of tasks){
+                const taskRef = doc(db,`project/${project.id}/category/${task.categoryId}/task/${task.taskId}`)
+                const taskDoc = await getDoc(taskRef);
+                const taskData = taskDoc.data();
+                if(taskData && taskData.taskAssign.includes(memberToRemove)){
+                    const updatedTaskAssign = taskData.taskAssign.filter((member:string)=> member !== memberToRemove);
+                    await updateDoc(taskRef,{
+                        taskAssign: updatedTaskAssign
+                    });
+                    console.log('成功刪除taskassign成員', updatedTaskAssign)
+                    setAssignedMembers(updatedTaskAssign);
+                    setNotAssignedMembers(updatedMembers.filter(member => !updatedTaskAssign.includes(member))) 
+                    
+                }
+
+            }
+
         }catch(error){
             console.log('刪除成員時出錯',error);
         }
     }
-    
+    //更新任務成員狀態
+    const handleMembersChange = (newAssignedMembers: string[], newNotAssignedMembers: string[]) => {
+        setAssignedMembers(newAssignedMembers);
+        setNotAssignedMembers(newNotAssignedMembers);
+    }
     //-----Category-------
     //刪除Category
     const onDeleteCategory = async(categoryId:string) => {
@@ -130,10 +171,6 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
     }
 
 
-    //console.log('有到這裡呦')
-    //console.log('key?',project.id)
-
-
     //--------------------------編輯project內容---------------------------
     //編輯標題
     const handleTitleBlur = () =>  {
@@ -152,23 +189,36 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
     const handleEndDate = () => {
         OnUpdate(project.id, {projectDateEnd: endDate})
     }
-
-
+    //-------------------------切換狀態-------------------------------
+    const [isContentVisible,setIsContentVisible] = useState<boolean>(false);
+    const toggleContent = () => {
+        setIsContentVisible(!isContentVisible);
+    }
     return (
         <>
             <div className='project'>
                 <div className='project-list'>
                     <div className='project-list-box'>
                         {/* Title */}
-                       
-                        <input placeholder='title' value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}></input>
+                        <button className='project-toggleBut'
+                            onClick={toggleContent}
+                        >
+                            <Image 
+                                className={`project-toggleImg ${isContentVisible? 'rotate':''}`} 
+                                src="/images/toggle.svg" alt="project toggle" width={20} height={20}/>
+                        </button>
+                        <input className='project-title' placeholder='Title' value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}></input>
                         {/* Status */}
-                        <select id="" value={status} onChange={(e) => setStatus(e.target.value)} onBlur={handleStatus}>
-                            
-                            <option value="Unstarted">Unstarted</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Done">Done</option>
-                        </select>
+
+                        <div className='project-status'>
+                            <Image className='project-statusImg' src="/images/projectStatus.svg" alt="project status" width={20} height={20}/>
+                            <select id="" value={status} onChange={(e) => setStatus(e.target.value)} onBlur={handleStatus}>
+                                <option value="Unstarted">Unstarted</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+                        
 
 
                         {/* Member !!!!這邊要另外處理member的部分*/}
@@ -177,74 +227,97 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
 
 
                         <div className='project-member'>
-                            <Image className='signup-img' src="/images/google.png" alt="Add Task" width={20} height={20}/>
-                            <div>member</div>
-                            {Array.isArray(members) && members.map((member) => (
-                                <MemberList
-                                    key={member} // 使用 member 作为 key 因为 member 是字符串
-                                    member={member}
-                                    OnDelete={() => handleDeleteMember(member)}
-                                />
-                            ))}
-                            <button onClick={()=> setShowMemberInput(true)}>+</button>
+                            <Image className='project-memberImg' src="/images/projectMember.svg" alt="project status" width={20} height={20}/>
+                            <div className='project-memberTitle'>member</div>
+                            <div className='project-memberList'>
+                                {Array.isArray(members) && members.map((member) => (
+                                    <MemberList
+                                        key={member} // 使用 member 作为 key 因为 member 是字符串
+                                        member={member}
+                                        OnDelete={() => handleDeleteMember(member)}
+                                    />
+                                ))}
+                            </div>
+                            
+                            <button className='project-memberAdd' onClick={()=> setShowMemberInput(true)}>
+                                <Image className='project-memberAdd' src="/images/add.svg" alt="project memberAdd" width={20} height={20}/>
+                            </button>
                         </div>
                         {/* 加入新成員視窗 showMemberInput */}
 
-                        {showMemberInput? 
-                            (<div className={`project-addMember ${showMemberInput? 'show' : ''}`}>
-                                <div>
-                                    <div>Enter email to join your member</div>
-                                    <div>
-                                    <input type="text" placeholder='' value={newMember} onChange={(e) => setNewMember(e.target.value)}/>
-                                    </div>
-                                        <button onClick={handleAddMember}>Add</button>
-                                        
-                                </div>
-
-                            </div>) :
+                        {showMemberInput&&
                             (
-                                <div></div>
-                            )
+                                <>
+                                <div className='overlay' onClick={() => setShowMemberInput(false)}></div>
+                                <div className='project-addMemberBar'>
+                                    <div className='addMemberBar-box'>
+                                        <div>Enter email to join your members</div>
+                                        <div>
+                                            <input type="text" placeholder='Member email' value={newMember} onChange={(e) => setNewMember(e.target.value)}/>
+                                        </div>
+                                            <button className='addMemberBar-add' onClick={handleAddMember}>Add</button>
+                                            <button className='addMemberBar-close' onClick={() => setShowMemberInput(false)}>x</button>
+                                    </div>
 
+                                </div>
+                                </>
+                            )
                         }
                   
                         {/* Date */}
-                        <input 
-                            type = "date" 
-                            value = {startDate}
-                            onChange = {(e) => setStartDate(e.target.value)}
-                            onBlur = {handleStartDate}
-                        />
-                        ~
-                        <input 
-                            type="date" 
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            onBlur = {handleEndDate}    
-                        />
+                        <div className='project-date'>
+                            <input 
+                                type = "date" 
+                                value = {startDate}
+                                onChange = {(e) => setStartDate(e.target.value)}
+                                onBlur = {handleStartDate}
+                            />
+                            ~
+                            <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                onBlur = {handleEndDate}    
+                            />
+                        </div>
                         
-                        <button>展開</button>
-                        <button onClick={OnDelete}>delete</button>
+                        <button className='project-delete' onClick={OnDelete}>
+                           <Image  src="/images/trash.svg" alt="project delete" width={20} height={20}/>
+                        </button>
+                        
+                        
                     </div>
 
                     
 
                 </div>
-                <div className='project-content'>
+                <div className={`project-content ${isContentVisible? 'visible': 'hidden'}`}>
                     
-                    {categories?.map(category => (
-                        <CategoryContent 
-                        key={category.id}
-                        category={category}
-                        OnDelete={()=>onDeleteCategory(category.id)}
-                        OnUpdate={handleUpdateCategory}
-                    />
-                    ))}
-                    <AddCategory
-                        projectId={project.id}
-                        setCategories={setCategories}
-                        categories={categories}
-                    />
+                    <div className='project-content-taskblock'>
+                        {categories?.map(category => (
+                                    <CategoryContent 
+                                    key={category.id}
+                                    category={category}
+                                    OnDelete={()=>onDeleteCategory(category.id)}
+                                    OnUpdate={handleUpdateCategory}
+                                    members={members}
+                                    updatedMembers={handleMembersChange}
+                                />
+                                ))}
+                    </div>
+                            
+                        
+                        
+                    <div className='project-content-addCat'>
+                        <AddCategory
+                            projectId={project.id}
+                            setCategories={setCategories}
+                            categories={categories}
+                        />
+                    </div>
+              
+                    
+                    
                 </div>
             </div>
            

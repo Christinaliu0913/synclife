@@ -9,18 +9,18 @@ interface MemberListProps {
 
 
 const MemberList: FC<MemberListProps> = ({member,OnDelete}) => {
-    //視窗是否出現
-    //key, member, setShowMemberInput, onAddMember
-    //新增project成員
-    
-    //新增新的會員
  
 
     return (
-        <div className='test'>
-            <div>{member}</div>
-            <button onClick={OnDelete}>X</button>
-        </div>
+        <>
+            
+                <div>
+                    <div className='project-memberList-member'>{member}<button onClick={OnDelete}>X</button></div>
+                </div>
+        
+            
+        </>
+        
 
     )
 

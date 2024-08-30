@@ -11,35 +11,43 @@ const Navigation = () => {
     return(
         <>
             <div className='sidebar'>
-                <div>
+                <div className='sidebarUser'>
                     <div>{userName}</div>
-                    <div>{userEmail}</div>
+                    <div className='email'>{userEmail}</div>
+                    <hr />
                 </div>
+        
                 <div className='menu'>
                     <ul>
-                        <li><Image src="/images/Date_today.png" alt="Description" width={20} height={20} /><a href="/pages">Calendar</a> </li>
                         <li>
-                            <span><Image src="/images/check-contained.png" alt="Description" width={20} height={20} /> To do list</span> 
-                            <ul className='sub-menu-project'>
-                              <li>test</li>
-                            </ul>
-                        </li>
-                        <li>
-                            <span><Image src="/images/Folder_light.png" alt="Description" width={20} height={20} /><a href="/pages/project">Project</a></span> 
-                            <ul className='sub-menu-project'>
-                                <li>test</li>
-                            </ul>
+                            <Image src="/images/Date_today.png" alt="Description" width={20} height={20} className='menu-listImg'/>
+                            <a href="/pages">Calendar</a>
                         </li>
                         <li>
                             <span>
+                                <Image src="/images/check-contained.png" alt="Description" width={20} height={20} className='menu-listImg'/>
+                                <a href="/pages/test">To do list</a>
+                            </span> 
+                        </li>
+                        <li>
+                            <span>
+                                <Image src="/images/Folder_light.png" alt="Description" width={20} height={20} className='menu-listImg'/>
+                                <a href="/pages/project">Project</a>
+                            </span> 
+                        </li>
+                        {/* <li>
+                            <span>
                                 Report
                             </span>
-                        </li>
+                        </li> */}
                     </ul>
                 </div>
-                <div>
-                    <SignOut/>
+                <div className='sidebar-signOut'>
+                    <div className='sidebar-signOut-box'>
+                        <SignOut/>
+                    </div>
                 </div>
+                    
             </div>
         </>
     );

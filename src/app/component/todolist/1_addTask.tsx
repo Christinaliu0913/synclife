@@ -1,8 +1,8 @@
-import { auth, db } from '../../../../firebase';
-import { collection, doc, setDoc} from 'firebase/firestore';
+import { useState } from "react"
 import { useAuth } from '../auth/authContext';
-import Image from 'next/image';
-import { Dispatch, SetStateAction } from 'react';
+import { db } from '../../../../firebase';
+import { collection, doc, setDoc} from 'firebase/firestore';
+import { User } from "firebase/auth";
 
 interface Task {
     id: string;
@@ -14,41 +14,37 @@ interface Task {
     taskDescription: string;
     taskOwner: string | null;
     calendarId: string;
-    projectId: string;
     createdAt: string;  
-}
-
-
-interface AddTaskProps {
-    categoryId: string;
-    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-    tasks: Task[];
+    projectTitle: string;
     projectId: string;
 }
 
+interface TaskProps{
+    currentUser: User|null;
+    loadingUser: boolean;
+    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+}
 
-const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) => {
-    const {currentUser,loadingUser} = useAuth();
-    const taskTitle = '';
+const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks}) => {
+
+    const [title,setTitle] = useState('')
     const taskStatus = 'unstarted';
-    const taskAssign = [''];
+    const taskAssign = [''] ;
     const taskNotAssign = ['']
     const taskDescription = '';
-    const taskDate = new Date().toISOString();//應該直接設置今天
+    //const taskDate = new Date().toISOString().slice(0,10);//應該直接設置今天
+    const taskDate = ''
     const taskOwner: string | null = currentUser?.email ?? null; 
     const calendarId = '';
-    
-    console.log('checasdfasdfadfilllll',projectId)
-    
-
-    //新增一個Task
+    const projectId = '';
+    const projectTitle = '';
     const handleAddTask = async() => {
         if(!loadingUser){
             if(currentUser){
-                const newDocRef = doc(collection(db, `project/${projectId}/category/${categoryId}/task`));
+                const newDocRef = doc(collection(db,`noProject/${currentUser.uid}/task`));
                 const newTask:Task = {
                     id: newDocRef.id,
-                        taskTitle,
+                        taskTitle:title,
                         taskStatus,
                         taskAssign,
                         taskNotAssign,
@@ -57,24 +53,22 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
                         taskOwner,
                         calendarId,
                         createdAt: new Date().toISOString(),
-                        projectId: projectId
+                        projectId,
+                        projectTitle
                 }
                 await setDoc(newDocRef, newTask)
-                console.log('已新增一個task了', newDocRef.id,`project/${projectId}/category/${categoryId}/task`)
 
-                setTasks(tasks => (tasks ? [...tasks, newTask] : [newTask]));
+                setTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
+                setTitle('');
             }
-            console.log('no currentUser')
         }
-    };
-
+    }
     return (
         <>
-            <button onClick={handleAddTask}>
-                + Task
-            </button>
+        <input type="text" placeholder='To do ....' value={title} onChange={(e)=> setTitle(e.target.value)}/>
+        <button className="tasklist-addTask" onClick={handleAddTask} >Add Task</button>
         </>
-    )
-}
+    );
 
+}
 export default AddTask;

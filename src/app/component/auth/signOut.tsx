@@ -24,7 +24,7 @@ const SignOut = () => {
 
     return(
         <>
-        <button onClick={logOutwithGoogle}>Log out</button>
+        <button className="hp-signOut-button" onClick={logOutwithGoogle}>Log out</button>
         </>
     )
 

@@ -5,12 +5,14 @@ import { useState, useEffect } from 'react'
 
 
 const useGoogleCalendarAPI = () => {
-    const [events, setEvents] = useState<any[]>([]);
+    const [googleEvents, setGoogleEvents] = useState<any[]>([]);
     const token = Cookies.get('googleToken')
+    //儲存calendar列表
+    const [googleCalendars, setGoogleCalendars] = useState<any[]>([]);
 
     useEffect(()=>{
         if(token){
-            console.log('有跑這裡a;lkdjfa');
+            console.log('有跑initClient');
             try{
                 gapi.load('client',()=>{
                     gapi.client.setToken({access_token:token});
@@ -37,9 +39,10 @@ const useGoogleCalendarAPI = () => {
     
     const readEvent = async () =>{
         try{
-    
+            
             const calendarList = await gapi.client.calendar.calendarList.list()
             const calendars = calendarList.result.items || [];
+            setGoogleCalendars(calendars);//設置日曆列表
             let allEvents: any[]= []
     
             for(const calendar of calendars){
@@ -53,14 +56,21 @@ const useGoogleCalendarAPI = () => {
                         orderBy: 'startTime'
                     });
                     const events = eventResponse.result.items || [];
+                    //加color到event中
+                    const colorEvents = events.map((event: any) => ({
+                        ...event,
+                        color: calendar.backgroundColor
+                    }))
                     
-                    allEvents = [...allEvents,...events]
+                    allEvents = [...allEvents,...colorEvents]
                     console.log('現在我想測試這個',allEvents)
             
                 }
             };
             
-            setEvents(allEvents);
+
+            
+            setGoogleEvents(allEvents);
             
         }catch(error){
             console.error('fetch google calendar的錯誤',error);
@@ -68,7 +78,7 @@ const useGoogleCalendarAPI = () => {
         
     };
     
-    return events;
+    return {googleEvents, googleCalendars};
     
 }   
 

@@ -50,9 +50,11 @@ const AddCategory:React.FC<AddCategoryProps>= ({projectId, setCategories, catego
     return (
 
     <> 
-    <button onClick={handleAddCategory}>
-        <Image src="/images/add.png" alt="Add Task" width={20} height={20} />Add Category
-    </button>
+
+    <div className='category-button' onClick={handleAddCategory}>
+        +<div className='category-text'>Category</div>
+    </div>
+    
     </>
     )
 

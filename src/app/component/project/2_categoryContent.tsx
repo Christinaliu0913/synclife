@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
 import AddTask from "./3_addTask";
+import Image from 'next/image';
 
 interface Category {
     id: string;
@@ -14,7 +15,8 @@ interface Task {
     id: string;
     taskTitle: string;
     taskStatus: string;
-    taskAssign: string;
+    taskAssign: string[]|[];
+    taskNotAssign: string[]|[];
     taskDate: string;
     taskDescription: string;
     taskOwner: string | null;
@@ -28,15 +30,16 @@ interface CategoryContentProps {
     category: Category;
     OnDelete: () => void;
     OnUpdate: (categoryId: string, updatedData: Partial<Category>) => void;
+    members: string[]|[];
+    updatedMembers: (assignedMembers: string[], notAssignedMembers: string[]) => void;
 }
 
-const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,OnUpdate}) => {
+const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,OnUpdate,members,updatedMembers}) => {
     const [title, setTitle] = useState(category.categoryTitle)
     //task
     const [tasks, setTasks] = useState<Task[]>([]);
     const projectId = category.projectId;
-    console.log('checkthis!!!',projectId) 
-    console.log('task',tasks)   
+
     
     //fetch task
     useEffect(()=>{
@@ -93,20 +96,38 @@ const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,O
 
     return (
         <div className="project-content-category">
-            <div> <input placeholder="title" value={title} type="text" onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}/></div>
-            <AddTask
-                categoryId={category.id}
-                setTasks={setTasks}
-                tasks={tasks}
-                projectId={category.projectId}
-            />
-            <button onClick={OnDelete}>delete</button>
+            <div className="categoryTitle">
+                 <input 
+                    className="categoryTitle-input"
+                    placeholder="Title" 
+                    value={title} 
+                    type="text" 
+                    onChange={(e)=>setTitle(e.target.value)} 
+                    onBlur={handleTitleBlur}/>
+                <button onClick={OnDelete}>
+                    Delete
+                </button>
+            </div>
+
+            <div className="category-addTask">
+                <AddTask
+                    categoryId={category.id}
+                    setTasks={setTasks}
+                    tasks={tasks}
+                    projectId={category.projectId}
+                />
+            </div>
+            
+            
             {tasks?.map(task => (
                 <TaskBlock
                     key={task.id}
                     task={task}
+                    categoryId={category.id}
                     OnDelete={handleDeleteTask}
                     OnUpdate={handleUpdateTask}
+                    members={members}
+                    updatedMembers={updatedMembers}
                 />
             ))}
 

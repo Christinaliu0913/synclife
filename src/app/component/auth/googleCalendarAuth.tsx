@@ -69,14 +69,14 @@ const GoogleCalendarAuth = () => {
         <>
             {isAuthorized ?
                 (
-                    <button onClick={handleRevokeGoogleCalendarAccess}>
+                    <button className='googleConnect' onClick={handleRevokeGoogleCalendarAccess}>
                         <Image src='/images/google.png' alt="" width={20} height={20}/>
-                        unconnect Google Calendar</button>
+                        Unconnect Google Calendar</button>
                 )
                 :(
-                    <button onClick={handleConnectToGoolgeCalendar}>
+                    <button  className='googleConnect' onClick={handleConnectToGoolgeCalendar}>
                         <Image src='/images/google.png' alt="" width={20} height={20}/>
-                        Connect to Google Calendar</button>
+                        <span>Connect to Google Calendar</span></button>
                 )
             }
             

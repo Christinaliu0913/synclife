@@ -1,57 +1,531 @@
+$primary-color: #C07767;
+$primary-colorDark: #AD6859;
+$minor-fontColor: #ffffffc0;
+$hover-color: #F9F9F9;
+$primary-backgroundColor: #FFF9F4;
+$grey: #5B5B5B;
+$greyLight: #C4C4C4;
+
+.main{
+    max-width: 100%;
+    margin: 0px;
+    background-color: $primary-backgroundColor;
+    color: #5B5B5B;
+    font-size: 16px;
+    display: flex;
+  }
+
+.project-addProject{
+    padding: 0px;
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    border-radius: 50%;
+    border: none;
+    text-align: center;
+    background-color: $primary-color;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    color: $primary-backgroundColor;
+    min-height: 90px;
+    width: 90px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    span{
+        font-size: 40px;
+    }
+    &:hover{
+        color: $hover-color;
+        box-shadow: 0px 1px 5px rgba(253, 253, 253, 0.3);
+        background-color: $primary-colorDark;
+    }
+}
+
+.project{
+    width: 100%;
+    height: auto;
+    color: $grey;
+}
+
 
 .project-list{
     display: flex;
     background-color: #ffff;
-    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    margin: 10px;
-    height: 100px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 15px;
+    padding: 10px;
+    min-height: 100px;
     justify-content: center;
     align-items: center;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    position: relative;
     .project-list-box{
         flex:auto;
         display: flex;
+        flex-wrap: wrap;
         input{
             border: none;
             background-color: #ffffff;
+            text-indent: 10px;
+            width: 130px;
             cursor: pointer;
+            margin: 5px;
+            height: auto;
+        }
+        input::placeholder {
+            color: $greyLight; 
+            opacity: 0.8; 
+          }
+        button{
+            border:none;
+        }
+        select{
+            border:none;
+            font-size: 16px;
+            color: $grey;
+            cursor: pointer;
+            padding: 0;
         }
     }
     
 }
-.project-addProject{
-    border: none;
-    background-color: #ffffff;
-    text-align: center;
-    cursor: pointer;
-}
 
-.project-member{
-display: flex;
-margin: 5px;
-height: auto;
-border: none
-}
-
-
-.project-content{
-    background-color: #ffff;
-    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    margin: 10px;
-    display: flex;
+.project-title{
+    font-size: 24px;
+    color: $grey;
     
-    button{
-        border: none;
-        background-color: #ffffff;
-        cursor: pointer;
+}
+
+.project-status{
+    display: flex;
+    align-items: center;
+    .project-statusImg{
+        
+    }
+    select{
+        position: relative;
+        top: 2px;
+        margin:4px;
     }
 }
 
-.task{
+.project-member{
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    height: auto;
+    border: none;
+    padding: 0px;
+    .project-memberImg{
+       margin:4px
+    }
+    .project-memberTitle{
+        position: relative;
+        top: 2px;
+        margin: 4px 4px;
+        
+    }
+    .project-memberList{
+        margin: 5px;
+        gap: 2px;
+        display: flex;
+        align-items: center;
+        height: 80px;
+        width: 250px;
+        border-radius: 5px;
+        overflow-x:auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        transition: all 0.2s ease;
+            .project-memberList-member{
+                margin: 3px 5px;
+                display: flex;
+                align-items: center;
+                background-color: $primary-backgroundColor;
+                box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+                height: 20px;
+                padding: 5px 10px;
+                text-indent: 5px;
+                border-radius: 10px;
+                transition: all 0.2s ease;
+                font-size: 12px;
+                button{
+                    font-size: 10px;
+                    color: $greyLight;
+                    transition: all 0.3s ease;
+                    background-color: #ffffff00;
+                    &:hover{
+                        color: $grey;
+                        font-size:16px
+                    }
+                }
+                &:hover{
+                    height: 30px;
+                }
+            }
+        &:hover{
+            width: 300px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+        }
+    }
+    .project-memberAdd{
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px  solid $primary-color;
+        transition: all 0.3s ease;
+        margin-left: 2px;
+        background-color: #ffffff00;
+        &:hover{
+            width:25px;
+            height: 25px;
+        }
+    }
+    
+}
+.overlay{
+    position:fixed;
+    top: 0;
+    left: 0;
+    width: 200vh;
+    height: 200vh;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: 100;
+}
+.project-addMemberBar{
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    border-radius: 8px;
+    top: 10%; 
+    left: 50%; 
+    height: 180px;
+    width: 330px;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    z-index: 102;
+    .addMemberBar-box{
+        height: auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        div{
+            margin: 6px;
+            font-size: 18px;
+            input{
+                border: 1px solid $greyLight;
+                width: 180px;
+                height: 40px;
+                color: $grey;
+                border-radius: 5px;
+            }
+        }
+        
+        .addMemberBar-add{
+            background-color: $primary-color;
+            color: #ffffff;
+            height: 40px;
+            width: 80px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            &:hover{
+                height: 45px;
+                width: 85px;
+                font-size: 15px;
+                background-color: $primary-colorDark;
+            }
+        }
+        .addMemberBar-close{
+            color: $greyLight;
+            position: absolute;
+            top:-15px;
+            right: -10px;
+        }
+    }
+
+}
+
+
+.project-date{
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    input{
+        background-color: #AD6859;
+        height: 30px;
+        width: 80px;
+    }
+    div{
+        margin:4px;
+    }
+}
+
+.project-delete{
+    position: absolute;
+    top: 42%;
+    right: 1%;
+    transition: all 0.2s ease;
+    height: 30px;
+    border-radius: 5px;
+    background-color: #ffffff00;
+    &:hover{
+        background-color: $hover-color;
+    }
+}
+.project-toggleBut{
+    background-color: #ffffff00;
+}
+.project-toggleImg{
+    transition:transform 0.3s ease;
+    transform: rotate(180deg);
+}
+.project-toggleImg.rotate{
+    transform: rotate(360deg)
+}
+
+.project-content{
+    max-height: 400px;
+    width: 100%;
+    max-width: 97%;
+    background-color: #ffff;
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 15px;
+    padding: 10px;
+    display: flex;
+    position: relative;
+    overflow: auto;
+    scrollbar-width: none;
+    transition:max-height 0.5s ease;
+    button{
+        border: none;
+        cursor: pointer;
+    }
+}
+.project-content.visible{
+    min-height: 100px;
+    max-height: 400px;
+}
+
+.project-content.hidden{
+    max-height: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+// .project-content-box{
+//     max-width: 100%;
+//     width: auto;
+// }
+
+.project-content-taskblock{
+    display: flex;
+    margin-left: 75px;
+}
+.project-content-addCat{
+    display: flex;
+    flex: auto;
+    position:absolute;
+    cursor: pointer;
+    
+    color: $primary-color;
+    .category-button{
+        font-size: 18px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: $primary-backgroundColor;
+        box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        &:hover{
+            width: 100px;
+            height: 40px;
+            border-radius: 5px;
+        }
+    }
+
+    
+}
+.project-content-addCat .category-text{
+    display: none;
+}
+
+.project-content-addCat:hover .category-text{
+    display: block;
+    margin: 5px;
+    font-size: 16px;
+    color: $grey;
+    color: $primary-color;
+   
+}
+
+.project-content-category{
+    font-size: 16px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    input{
+        input::placeholder {
+            color: $greyLight; 
+            opacity: 0.8; 
+          }
+    }
+}
+
+.categoryTitle{
+    display: flex;
+    input::placeholder {
+        color: $greyLight; 
+        opacity: 0.8; 
+    }
+    button{
+        flex: auto;
+        padding: 5px;
+        margin: 5px;
+        font-size: 13px;
+        color: $greyLight;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        &:hover{
+            font-size:15px;
+            color:$grey;
+        }
+    }
+}
+
+.categoryTitle-input{
+    font-size: 16px;
+    max-width: 200px;
+    width: 200px;
+    height: 30px;
+    border: 1px solid $primary-color;
+    border-radius: 5px;
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+}
+
+.category-addTask{
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button{
+        font-size: 16px;
+        color: $greyLight;
+        transition: all 0.3s ease;
+        background-color: #ffffff00;
+        display: flex;
+        justify-content: center;
+        &:hover{
+            color: $grey;
+            font-size:16px
+        }
+    }
+    
+}
+
+// ----------TaskBlock------------------------------------
+.taskBlock{
   background-color: #FFF9F4;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
-  padding: 5px;
+  padding: 10px;
   margin: 5px;
+  max-width: 250px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+    input, select{
+        flex:auto;
+        border: none;
+        background-color: #ffffff;
+        cursor: pointer;
+        height: 30px;
+        width: 100%;
+        font-size: 16px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+    input::placeholder {
+        color: $greyLight; 
+        opacity: 0.8; 
+      }
+}
+
+.taskBlock-Assign{
+    background: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.taskBlock-AssignList{
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    overflow-x:auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    transition: all 0.2s ease;
+    width: 98%;
+    height: 40px;
+    position: relative;
+    .taskBlock-AssignList-Img{
+        background-color: #ffffff;
+        margin-left: 5px;
+
+    }
+    .taskBlock-AssignMember{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+        width: auto;
+        border-radius: 5px;
+        background-color: $primary-backgroundColor;
+        height: 20px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        text-indent: 5px;
+        button{
+            background: #ffffff00;
+            font-size: 10px;
+            color: $greyLight;
+            transition: all 0.3s ease;
+            &:hover{
+                color: $grey;
+                font-size:16px
+            }
+        }
+        &:hover{
+            height: 30px;
+        }
+    }
+    &:hover{
+        width: 100%;
+        height: 45px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+}
+
+
+.taskNote{
+    margin-top: 5px;
+}
+.taskDelete{
+    margin-top: 5px;
+    height: 20px;
+    border-radius: 5px;
+    color: $greyLight;
+    transition: all 0.2s ease;
+    &:hover{
+        color: $grey;
+        height: 30px;
+    }
 }

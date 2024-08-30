@@ -11,7 +11,7 @@ interface EventData {
     checkAllDay: boolean;
     calendar: string;
     description: string;
-    project: string;
+    newProject: string|null;
 
 }
 

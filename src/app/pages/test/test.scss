@@ -1,0 +1,141 @@
+$primary-color: #C07767;
+$primary-colorDark: #AD6859;
+$minor-fontColor: #ffffffc0;
+$hover-color: #F9F9F9;
+$primary-backgroundColor: #FFF9F4;
+$grey: #5B5B5B;
+$greyLight: #C4C4C4;
+
+.body{
+    max-width: 100%;
+    margin: 0px;
+    background-color: $primary-backgroundColor;
+    color: #5B5B5B;
+    font-size: 16px;
+    display: flex;
+    
+  }
+
+.main{
+    display: flex;
+    align-items: center;
+}
+.list{
+margin: 15px;
+width: 1000px;
+font-size: 16px;
+    input{
+        border: none;
+        border-radius: 5px;
+        height: 30px;
+        margin: 8px;
+        font-size: 16px;
+        text-indent: 5px;
+        box-shadow: 0px 2px 5px rgba(63, 63, 63, 0.1);
+    }
+    button{
+        border: none;
+    }
+}
+
+.list-filter{
+    display: none;
+}
+.list-task{
+    display: flex;
+}
+
+// -----------checkbox---------------
+.tasklist-check-container {
+    display: flex;
+    align-items: center;
+}
+
+.tasklist-check {
+    display: none; /* 隐藏默认的复选框 */
+}
+
+.tasklist-check + label {
+    display: inline-block; /* 使用 inline-block 而不是 absolute */
+    width: 25px; /* 自定义复选框的宽度 */
+    height: 25px; /* 自定义复选框的高度 */
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    background: #fff;
+    margin-right: 10px; /* 添加右边距以分隔文本 */
+    cursor: pointer;
+    position: relative; /* 位置相对，以便可以使用伪元素 */
+}
+
+.tasklist-check:checked + label {
+    background-color: $greyLight; /* 替换 $greyLight 为实际的颜色值 */
+    border-color: $greyLight;
+}
+
+.tasklist-check:checked + label:after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 9px;
+    top: 4px;
+}
+
+.tasklist-title-container{
+    display: flex;
+
+}
+.tasklist-projectSelect{
+    cursor: pointer;
+    border: none;
+    background-color: #ffffff00;
+    &:hover{
+        background-color: $minor-fontColor;
+    }
+}
+.tasklist-projectImg{
+    margin-right: 5px;
+    position: relative;
+    top: 12px
+}
+
+.tasklist-delete{
+    position: relative;
+    top: 10px;
+    width: 25px;
+    height: 25px;
+    color: $greyLight;
+    transition: all 0.2s ease;
+    &:hover{
+        color: $grey;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+.overlay{
+    position:fixed;
+    top: 0;
+    left: 0;
+    width: 200vh;
+    height: 200vh;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.tasklist-addTask{
+    background: $primary-color;
+    color: #fff;
+    width: 80px;
+    height: 30px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    &:hover{
+        background: $primary-colorDark;
+        width: 85px;
+        height: 35px;
+    }
+}

@@ -1,22 +1,31 @@
 import { useState } from 'react'
+import AssignMember from './member/taskAssign_Member';
 
 interface Task {
     id: string;
     taskTitle: string;
     taskStatus: string;
-    taskAssign: string;
+    taskAssign: string[]|[];
+    taskNotAssign: string[]|[];
     taskDate: string;
     taskDescription: string;
+    taskOwner: string | null;
+    calendarId: string;
+    projectId: string;
+    createdAt: string;  
 }
 
 interface TaskBlockProps {
     task: Task;
     OnDelete: (taskId: string) => void;
     OnUpdate: (taskId: string, updatedTask: Partial<Task>) => void;
+    categoryId: string|null;
+    members: string[]|[];
+    updatedMembers: (assignedMembers: string[], notAssignedMembers: string[]) => void;
 }
 
 
-const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate}) => {
+const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,members,updatedMembers}) => {
     const [title, setTitle] = useState(task.taskTitle);
     const [status, setStatus] = useState(task.taskStatus);
     const [assign, setAssign] = useState(task.taskAssign);
@@ -30,34 +39,34 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate}) => {
     }
 
     const handleStatus = () =>{
-        OnUpdate(task.id, {taskTitle: status})
+        OnUpdate(task.id, {taskStatus: status})
     }
 
     const handleDate = () =>{
-        OnUpdate(task.id, {taskTitle: date})
+        OnUpdate(task.id, {taskDate: date})
     }
     const handleDescription = () =>{
-        OnUpdate(task.id, {taskTitle: description})
+        OnUpdate(task.id, {taskDescription: description})
     }
 
     return(
-        <div className="task">
+        <div className="taskBlock">
 
             <div>
-                <input type="text" placeholder="title" value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}/>
+                <input type="text" placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}/>
             </div>
             
 
-            <label htmlFor="status">Status</label>
+            <label htmlFor="status"></label>
             <select name="" id="" value={status} onChange={(e) => setStatus(e.target.value)} onBlur={handleStatus}>
-                <option value="Unstarted">Unstarted</option>
-                <option value="Processing">Processing</option>
-                <option value="Done">Done</option>
+                <option value="Unstarted">  Unstarted</option>
+                <option value="Processing">  Processing</option>
+                <option value="Done">  Done</option>
             </select>
 
 
             <div>
-                <label htmlFor="taskDate" >Date</label>
+                <label htmlFor="taskDate" ></label>
                 <input 
                     type="date" 
                     value={date}
@@ -69,15 +78,18 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate}) => {
             
             
             {/* asign這邊應該要在加入一個組件 */}
-            <div>
-                <label htmlFor="assign">Assign</label>
-                <button >add</button>
-            </div>
-
+            <AssignMember
+                taskId = {task.id}
+                projectId = {task.projectId}
+                categoryId = {categoryId}
+                members={members}
+                updatedMembers={updatedMembers}
+            />
             
             <div>
-                <label htmlFor="description">Note</label>
+                <label htmlFor="description"></label>
                 <input 
+                    className='taskNote'
                     type="text" 
                     placeholder="Note" 
                     value={description}
@@ -85,7 +97,7 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate}) => {
                     onBlur = {handleDescription}
                 />
             </div>
-            <button onClick={()=>OnDelete(task.id)}>delete</button>
+            <button className='taskDelete' onClick={()=>OnDelete(task.id)}>Delete</button>
         </div>
     )
 }

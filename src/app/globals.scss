@@ -1,29 +1,180 @@
+$primary-color: #C07767;
+$primary-colorDark: #AD6859;
+$minor-fontColor: #ffffffc0;
+$hover-color: #F9F9F9;
+$primary-backgroundColor: #FFF9F4;
+$grey: #5B5B5B;
+$greyLight: #C4C4C4;
+
+
+
 body{
   margin: 0px;
-  background-color: #FFF9F4;
+  background-color: $primary-backgroundColor;
+  color: #5B5B5B;
 }
 .hp-nav{
-  background-color: #C07767;
-  height: 30px;
+  background-color:$primary-color;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
 }
-.signup-img{
-  height: 10px;
-  width: 10px;
+.hp-navlogo{
+  margin: 10px;
+  position: relative;
+  top: 9px;
 }
+.hp-main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 500px;
+  flex-direction: column;
+  .hp-main-subtitle{
+    font-size: 20px;
+    position: relative;
+    top: -70px;
+    left:40px;
+  }
+}
+
+.hp-signup-button{
+  width: 300px;
+  height: 50px;
+  border-radius: 120px;
+  color: #676767;
+  font-size: 20px;
+  border: 1px solid $primary-color;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all  0.3s ease;
+  .hp-signup-img{
+    position: relative;
+    left: -15px;
+    top: 2px;
+  }
+  &:hover{
+    font-size: 21px;
+    background-color: $hover-color;
+    color: $primary-color;
+  }
+}
+.hp-signOut-button{
+  width: 100px;
+  height: 50px;
+  border-radius: 120px;
+  color: #676767;
+  font-size: 16px;
+  border: 1px solid $primary-color;
+  background-color: #ffffff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  &:hover{
+    background-color: $hover-color;
+    color: $primary-color;
+    box-shadow: 0px 1px 5px rgba(253, 253, 253, 0.3);
+  }
+}
+
+//connecttoGoogle
+.googleConnect{
+  background: #ffffff; 
+  border: 1px solid $primary-color;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+  border-radius: 5px;
+  gap: 5px;
+  font-size: 16px;
+  color: $grey;box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  &:hover{
+    background-color: $hover-color;
+    color: $primary-color;
+    box-shadow: 0px 1px 5px rgba(253, 253, 253, 0.3);
+    height: 42px;
+  }
+}
+
 .sidebar{
+  position: sticky;
+  top: 0px;
   text-indent: 10px;
   color: #ffff;
   background-color: #C07767;
   display: flex;
   height: 100vh;
-  width: 256px;
+  width: 200px;
   flex-direction: column;
   border-radius: 0px 10px 10px 0px;
-  ul li{
-    list-style: none;
-    margin: 10px;
+  box-shadow: 3px 2px 7px rgba(0, 0, 0, 0.2);
+  .menu{
+    ul{
+      padding: 0px;
+      width: auto;
+      li{
+        list-style: none;
+        margin: 0px 0px 4px 0px;;
+        font-size: 16px;
+        height: 40px;
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+        .menu-listImg{
+          position: relative;
+          top: 7px;
+        }
+        a{
+          position: relative;
+          top: 5px;
+          left: 10px;
+          text-decoration: none;
+          color:#ffffff;
+          &:hover{
+            color: $minor-fontColor;
+          }
+        }
+        &:hover{
+          background-color: $primary-colorDark;
+        }
+      }
+      
+
+    }
+  }
+  
+}
+.sidebarUser{
+  margin-top: 10px;
+  font-size: 18px;
+  .email{
+    font-size: 13px;
+    color:$minor-fontColor;
+    position: relative;
+    left: 3px;
+  }
+  hr {
+    border: 0.5px solid  $primary-colorDark;
+    margin-bottom: 20px;
   }
 }
+
+.sidebar-signOut{
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  .sidebar-signOut-box{
+    display: flex;
+    justify-content: center;
+    width: auto;
+  }
+}
+
 .pages-container {
   display: flex;
   .main{
@@ -45,7 +196,229 @@ body{
 }
 
 .test{
+  background-color: #C07767;
   display: flex;
   border: 1px solid #C07767;
   height: auto;
+}
+.testList{
+  display: flex;
+}
+*button{
+  cursor:pointer;
+}
+
+
+// --------------------Eventsidebar-----------
+
+.addEvent-sidebar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  padding: 10px;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  background-color: $primary-backgroundColor;
+  z-index: 102;
+  box-shadow: 3px 2px 7px rgba(0, 0, 0, 0.1);
+  input{
+    border: none;
+  }
+}
+.sidebar-overlay{
+  position:fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 200vh;
+  height: 200vh;
+  background-color: rgba(255, 255, 255, 0.108);
+}
+
+.addEvent-sidebar-container{
+  position: relative;
+  width: 100%;
+  z-index: 102;
+  div{
+    margin-top: 5px;
+  }
+
+}
+
+.sidebar-title{
+
+  input{
+    height: 30px;
+    width: 100%;
+    font-size: 16px;
+  }
+}
+
+.sidebar-allday{
+  height: 30px;
+  display: flex;
+  justify-content: flex-end;
+  label{
+    color: $grey;
+    font-size: 14px;
+    margin-top: 2px;
+    padding: 0px;
+  }
+  input{
+    width: 15px;
+    height: 15px;
+    margin: 3px;
+  }
+}
+
+.sidebar-date{
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  label{
+    flex:auto;
+  }
+  input{
+    flex:auto;
+    height: 30px;
+    border-radius: 5px;
+ 
+  }
+}
+.sidebar-note{
+  input{
+    width: 100%;
+    height: 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    
+  }
+}
+
+.sidebar-project{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  
+  select{
+    border: none;
+    height: 30px;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 5px;
+    
+  }
+}
+
+.sidebar-cancel{
+  margin:10px 5px 0px 0px;
+  background: $greyLight;
+  color: #fff;
+  width: 80px;
+  height: 30px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  &:hover{
+      background: $grey;
+      width: 85px;
+      height: 35px;
+  }
+}
+
+.sidebar-save{
+  background: $primary-color;
+  color: #fff;
+  width: 80px;
+  height: 30px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  margin: 10px 5px 0px 0px;
+  &:hover{
+      background: $primary-colorDark;
+      width: 85px;
+      height: 35px;
+  }
+}
+
+.sidebar-delete{
+    position: absolute;
+    bottom: 0px;
+    right: 2px;
+    border:none;
+    transition: all 0.2s ease;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover{
+        height: 23px;
+        width: 23px;
+        background-color: $hover-color;
+    }
+}
+
+
+//---------------fullcalendar-----------------
+.fc-button-active{
+  background-color: $primary-color;
+}
+.fc{
+  background-color: #ffffff;
+  margin: 5px;
+  .fc-toolbar-title {
+    font-size: 1.4em;
+    font-weight: normal;
+    text-indent: 10px;
+    color: $primary-color;
+
+  }
+  .fc-button-active{
+    background-color: $primary-color;
+  }
+  .fc-button {
+    background-color: $primary-backgroundColor;
+    border: 1px solid $primary-color;
+    color: $primary-color;
+   
+  }
+  .fc-button-active {
+    background-color: $primary-color;
+  }
+
+  .fc-button:hover {
+    background-color:$primary-color;
+  }
+}
+.fc-toolbar {
+  background-color: $primary-backgroundColor;
+  height: 60px;
+  border-bottom: 1px solid #e0d6d1;
+  margin-bottom: 20px;
+}
+.fc-col-header-cell {
+  color: $primary-color;
+  padding: 10px;
+  height: 70px;
+  text-align: center;
+  position: relative;
+  .fc-col-header-cell-cushion{
+    font-size: 20px;
+    font-weight: 300;
+    margin-top: 40px;
+    
+  }
+  
+}
+
+
+.fc-timegrid-now-indicator {
+  background-color: #a25e52;
+}
+.fc-neutral-bg{
+  background-color: #a25e52;
 }

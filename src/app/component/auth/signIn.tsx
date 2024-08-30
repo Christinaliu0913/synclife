@@ -42,8 +42,8 @@ const SignIn = () =>{
                 </div>
                 ) 
                 : 
-                (<button onClick={signWithGoogle}>
-                    <Image className='signup-img'src='/images/google.png' alt="SignIn" width={20} height={20}/>Continue with Google
+                (<button className='hp-signup-button' onClick={signWithGoogle}>
+                    <Image className='hp-signup-img'src='/images/google.png' alt="SignIn" width={20} height={20}/>Continue with Google
                 </button>)
             } 
             {currentUser ? (
