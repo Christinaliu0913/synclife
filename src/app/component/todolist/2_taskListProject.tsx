@@ -41,7 +41,7 @@ const TaskListProject:React.FC<TaskListProjectProps> = ({ task, projects}) => {
 
     },[task])
 
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (newProject !== taskProject) {
             handleSelectProject();

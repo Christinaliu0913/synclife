@@ -87,6 +87,7 @@ const CalendarComponent = () =>{
     
   
     //載入時確認token跟events來設置events
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         
             const checkProjectForEvents = async() => {

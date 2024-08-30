@@ -106,6 +106,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     const [projects, setProjects] = useState<Project[]>([]);
     console.log('確認selected日曆',selectedEvent)
     //處理選到evnet的資訊
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(()=>{
         //確認選到event的內容
         if(selectedEvent){
