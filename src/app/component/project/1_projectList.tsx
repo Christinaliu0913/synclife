@@ -283,7 +283,7 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
                         </div>
                         
                         <button className='project-delete' onClick={OnDelete}>
-                           <Image  src="/images/trash.svg" alt="project delete" width={20} height={20}/>
+                           <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
                         </button>
                         
                         

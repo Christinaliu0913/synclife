@@ -339,7 +339,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     <div
                         className='sidebar-delete' 
                         onClick={Ondelete}>
-                        <Image className='sidebar-delete' src="/images/trash.svg" alt="task project" width={20} height={20}/>
+                        <Image className='sidebar-delete' src="/images/delete.svg" alt="task project" width={20} height={20}/>
                     </div>
                 )}
             </div>
