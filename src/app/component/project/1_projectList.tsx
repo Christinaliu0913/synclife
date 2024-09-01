@@ -200,6 +200,7 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
                 <div className='project-list'>
                     <div className='project-list-box'>
                         {/* Title */}
+                        
                         <button className='project-toggleBut'
                             onClick={toggleContent}
                         >
@@ -292,29 +293,32 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
 
                 </div>
                 <div className={`project-content ${isContentVisible? 'visible': 'hidden'}`}>
-                    
-                    <div className='project-content-taskblock'>
-                        {categories?.map(category => (
-                                    <CategoryContent 
-                                    key={category.id}
-                                    category={category}
-                                    OnDelete={()=>onDeleteCategory(category.id)}
-                                    OnUpdate={handleUpdateCategory}
-                                    members={members}
-                                    updatedMembers={handleMembersChange}
-                                />
-                                ))}
-                    </div>
+                    <div className='project-content-box'>
+                        <div className='project-content-addCat'>
+                            <AddCategory
+                                projectId={project.id}
+                                setCategories={setCategories}
+                                categories={categories}
+                            />
+                        </div>
+                        <div className='project-content-taskblock'>
+                            {categories?.map(category => (
+                                        <CategoryContent 
+                                        key={category.id}
+                                        category={category}
+                                        OnDelete={()=>onDeleteCategory(category.id)}
+                                        OnUpdate={handleUpdateCategory}
+                                        members={members}
+                                        updatedMembers={handleMembersChange}
+                                    />
+                                    ))}
+                        </div>
+                                
                             
+                         
                         
-                        
-                    <div className='project-content-addCat'>
-                        <AddCategory
-                            projectId={project.id}
-                            setCategories={setCategories}
-                            categories={categories}
-                        />
                     </div>
+                    
               
                     
                     

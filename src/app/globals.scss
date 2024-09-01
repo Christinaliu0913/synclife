@@ -1,10 +1,39 @@
 $primary-color: #C07767;
 $primary-colorDark: #AD6859;
+$primary-colorLight: #e4aea245;
 $minor-fontColor: #ffffffc0;
 $hover-color: #F9F9F9;
 $primary-backgroundColor: #FFF9F4;
 $grey: #5B5B5B;
 $greyLight: #C4C4C4;
+
+@media (max-width: 768px) {
+    
+  .main{
+      margin-top: 60px !important;
+  }
+  .sidebar-phone{
+      display: flex !important;
+  }
+  .sidebar-phone-close{
+      display: block!important;
+  }
+  .sidebar{
+     transform: translateX(-100%)!important;
+     position: fixed !important;
+     z-index: 10000 !important;
+  }
+  .sidebar-phone-show{
+      transform: translateX(0)!important;
+  }
+  .project-memberList{
+    width: 200px!important;
+  }
+  .project-delete{
+    top: 2% !important;
+    right: 1% !important;
+  }
+}
 
 
 
@@ -102,98 +131,7 @@ body{
   }
 }
 
-.sidebar{
-  position: sticky;
-  top: 0px;
-  text-indent: 10px;
-  color: #ffff;
-  background-color: #C07767;
-  display: flex;
-  height: 100vh;
-  width: 200px;
-  flex-direction: column;
-  border-radius: 0px 10px 10px 0px;
-  box-shadow: 3px 2px 7px rgba(0, 0, 0, 0.2);
-  .menu{
-    ul{
-      padding: 0px;
-      width: auto;
-      li{
-        list-style: none;
-        margin: 0px 0px 4px 0px;;
-        font-size: 16px;
-        height: 40px;
-        border-radius: 10px;
-        transition: background-color 0.3s ease;
-        .menu-listImg{
-          position: relative;
-          top: 7px;
-        }
-        a{
-          position: relative;
-          top: 5px;
-          left: 10px;
-          text-decoration: none;
-          color:#ffffff;
-          &:hover{
-            color: $minor-fontColor;
-          }
-        }
-        &:hover{
-          background-color: $primary-colorDark;
-        }
-      }
-      
 
-    }
-  }
-  
-}
-.sidebarUser{
-  margin-top: 10px;
-  font-size: 18px;
-  .email{
-    font-size: 13px;
-    color:$minor-fontColor;
-    position: relative;
-    left: 3px;
-  }
-  hr {
-    border: 0.5px solid  $primary-colorDark;
-    margin-bottom: 20px;
-  }
-}
-
-.sidebar-signOut{
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  .sidebar-signOut-box{
-    display: flex;
-    justify-content: center;
-    width: auto;
-  }
-}
-
-.pages-container {
-  display: flex;
-  .main{
-    display: flex;
-    flex-direction: column;
-    flex:auto;
-  }
-}
-
-.addEvent-sidebar{
-  width: 300px;
-  display: none;
-  position: absolute;
-  &.show{
-    display: block;
-    transform: translateX(0);
-  }
-
-}
 
 .test{
   background-color: #C07767;
@@ -209,7 +147,9 @@ body{
 }
 
 
-// --------------------Eventsidebar-----------
+// ---------------------------------------------Eventsidebar------------------------------------------------
+
+
 
 .addEvent-sidebar{
   display: flex;
@@ -227,6 +167,16 @@ body{
     border: none;
   }
 }
+// .addEvent-sidebar{
+//   width: 300px;
+//   display: none;
+//   position: absolute;
+//   &.show{
+//     display: block;
+//     transform: translateX(0);
+//   }
+
+// }
 .sidebar-overlay{
   position:fixed;
   top: 0;
@@ -363,13 +313,13 @@ body{
 }
 
 
-//---------------fullcalendar-----------------
-.fc-button-active{
-  background-color: $primary-color;
-}
+//-----------------------------------------fullcalendar--------------------------------------------
 .fc{
   background-color: #ffffff;
-  margin: 5px;
+  margin: 2px;
+  .fc-media-screen{
+    margin: 5px;
+  }
   .fc-toolbar-title {
     font-size: 1.4em;
     font-weight: normal;
@@ -377,44 +327,53 @@ body{
     color: $primary-color;
 
   }
-  .fc-button-active{
-    background-color: $primary-color;
-  }
   .fc-button {
     background-color: $primary-backgroundColor;
     border: 1px solid $primary-color;
     color: $primary-color;
    
   }
-  .fc-button-active {
-    background-color: $primary-color;
-  }
 
   .fc-button:hover {
     background-color:$primary-color;
   }
 }
+
 .fc-toolbar {
   background-color: $primary-backgroundColor;
   height: 60px;
-  border-bottom: 1px solid #e0d6d1;
+  border-bottom: none;
   margin-bottom: 20px;
 }
 .fc-col-header-cell {
   color: $primary-color;
   padding: 10px;
-  height: 70px;
+  height: 20px;
   text-align: center;
   position: relative;
+  border: none;
   .fc-col-header-cell-cushion{
     font-size: 20px;
     font-weight: 300;
-    margin-top: 40px;
-    
+    margin-top: 2px;
   }
   
 }
+//最上面那個邊
+.fc .fc-scrollgrid {
+  border-width: 0 0 0 0; /* 外側の枠線消す */
 
+  font-weight: normal;
+  background-color: #ffffffc0;
+}
+
+/*　今日の背景 */
+.fc .fc-daygrid-day.fc-day-today {
+  background: $primary-colorLight;
+}
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame {
+  background: $primary-colorLight;
+}
 
 .fc-timegrid-now-indicator {
   background-color: #a25e52;

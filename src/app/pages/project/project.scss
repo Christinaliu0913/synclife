@@ -15,6 +15,13 @@ $greyLight: #C4C4C4;
     display: flex;
   }
 
+.noproject-text{
+    position: relative;
+    top: 70px;
+    text-align: center;
+    font-size:20px;
+    color: $greyLight;
+}
 .project-addProject{
     padding: 0px;
     position: fixed;
@@ -291,8 +298,8 @@ $greyLight: #C4C4C4;
 
 .project-content{
     max-height: 400px;
-    width: 100%;
-    max-width: 97%;
+    width: auto;
+    max-width: 100%;
     background-color: #ffff;
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -323,9 +330,10 @@ $greyLight: #C4C4C4;
 //     width: auto;
 // }
 
+
 .project-content-taskblock{
     display: flex;
-    margin-left: 75px;
+    margin-left: 70px;
 }
 .project-content-addCat{
     display: flex;

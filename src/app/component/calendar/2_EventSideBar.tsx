@@ -247,7 +247,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
         <>
         {/* 點擊才會show */}
         {sideBarVisible && (
-            <div className={`addEvent-sidebar `}>
+            <div className={`addEvent-sidebar`}>
             
             <div className='addEvent-sidebar-container'>
                 {/* 表單 */}
@@ -256,7 +256,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     <input  type="text" id='title' value={title} onChange={(e)=>setTitle(e.target.value)} placeholder='Tilte'/>
                 </div>
                 
-               
+            
                 <div className='sidebar-date'>
                     <label htmlFor="start">Start time</label>
                     <input type={checkAllDay ? "date" : "datetime-local"} id='start' value={start} onChange={(e)=>setStart(e.target.value)} placeholder='start time'/>

@@ -91,7 +91,7 @@ const ProjectMain = () => {
 
     return (
         <>
-        
+            <div className='noproject-text'> Click the button to create your own project! </div>
             {projects?.map(project => (
                 <ProjectList 
                     key={project.id}

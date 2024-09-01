@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react';
 import { useAuth } from '../auth/authContext';
 import SignOut from '../auth/signOut'
 import Image from 'next/image';
@@ -7,10 +8,22 @@ const Navigation = () => {
     const {currentUser} = useAuth();
     const userName = currentUser? (currentUser.displayName ): ('Set your name')
     const userEmail = currentUser? currentUser.email: null;
-
+    const [isSidebarVisible, setIsSidebarVisible] = useState(true)
+    const handleNavShow = () => {
+        setIsSidebarVisible(!isSidebarVisible);
+    }
     return(
         <>
-            <div className='sidebar'>
+            <div className='sidebar-phone'>
+                <button onClick={handleNavShow}>
+                    ☰
+                </button>
+                <div className='sidebar-phone-Img'>
+                    <Image src='/images/logoLight.svg' alt="logo" width={100} height={50}></Image>
+                </div>
+            </div>
+            <div className={`sidebar ${isSidebarVisible? 'sidebar':'sidebar-phone-show'}`}>
+                <button className='sidebar-phone-close' onClick={handleNavShow}>x</button>
                 <div className='sidebarUser'>
                     <div>{userName}</div>
                     <div className='email'>{userEmail}</div>

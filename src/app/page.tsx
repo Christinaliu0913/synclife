@@ -14,7 +14,7 @@ export default function Home() {
       <div className="hp-main">
           <Image src='/images/logo.svg' alt="logo" width={400} height={200}></Image>
           <div className="hp-main-subtitle"> 同步管理你的生活計畫</div>
-          <SignIn/>
+          <SignIn />
       </div>     
     </>
     
