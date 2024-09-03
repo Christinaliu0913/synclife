@@ -1,17 +1,37 @@
 'use client'
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useAuth } from '../auth/authContext';
 import SignOut from '../auth/signOut'
 import Image from 'next/image';
+import TodoListToggle from '../todolist/0_test';
+
+interface Task {
+    id: string;
+    taskTitle: string;
+    taskStatus: string;
+    taskAssign: string[]|[];
+    taskNotAssign: string[]|[];
+    taskDate: string;
+    taskDescription: string;
+    taskOwner: string | null;
+    calendarId: string;
+    projectId: string;
+    projectTitle: string;
+    createdAt: string;  
+}
+
+
 
 const Navigation = () => {
     const {currentUser} = useAuth();
     const userName = currentUser? (currentUser.displayName ): ('Set your name')
     const userEmail = currentUser? currentUser.email: null;
     const [isSidebarVisible, setIsSidebarVisible] = useState(true)
+    const [isTodolistShow, setIsTodlistShow] = useState(false);
     const handleNavShow = () => {
         setIsSidebarVisible(!isSidebarVisible);
     }
+    const [tasks,setTasks] = useState<Task[]|[]>([])
     return(
         <>
             <div className='sidebar-phone'>
@@ -37,9 +57,9 @@ const Navigation = () => {
                             <a href="/pages">Calendar</a>
                         </li>
                         <li>
-                            <span>
+                            <span  >
                                 <Image src="/images/check-contained.png" alt="Description" width={20} height={20} className='menu-listImg'/>
-                                <a href="/pages/test">To do list</a>
+                                <a onClick={()=>setIsTodlistShow(!isTodolistShow)}>To do list</a>
                             </span> 
                         </li>
                         <li>
@@ -48,19 +68,25 @@ const Navigation = () => {
                                 <a href="/pages/project">Project</a>
                             </span> 
                         </li>
-                        {/* <li>
-                            <span>
-                                Report
-                            </span>
-                        </li> */}
+                        
                     </ul>
                 </div>
+
+                
                 <div className='sidebar-signOut'>
                     <div className='sidebar-signOut-box'>
                         <SignOut/>
                     </div>
                 </div>
                     
+            </div>
+            <div>
+                <TodoListToggle
+                    setIsTodlistShow={setIsTodlistShow}
+                    isTodolistShow={isTodolistShow}
+                    tasks={tasks}
+                    setTasks={setTasks}
+                />
             </div>
         </>
     );

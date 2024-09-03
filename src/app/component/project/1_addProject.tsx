@@ -27,7 +27,7 @@ const AddProject: React.FC<AddProjectProps> = ({setProjects,projects}) => {
     
     const {currentUser,loadingUser} = useAuth();
     const projectTitle = '';
-    const projectStatus = 'unstarted';
+    const projectStatus = 'Unstarted';
     const projectMember: string[] = currentUser && currentUser.email ? [currentUser.email] : [];
     const projectDateStart = new Date().toISOString();//應該直接設置今天
     const projectDateEnd = '';

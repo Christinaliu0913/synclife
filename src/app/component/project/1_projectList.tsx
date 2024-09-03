@@ -26,10 +26,24 @@ interface ProjectListProps {
     OnUpdate: (id: string, updatedData: Partial<Project>) => void;
 }
 
+const getStatusColor = (status: string): string => {
+    switch(status){
+        case "Unstarted":
+            return "#5b95ad" ;
+        case "Processing":
+            return "#C07767";
+        case "Done":
+            return "#5B5B5B"
+        default:
+            return 'none';
+    }
+}
+
 const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) => {
     //set project資料 
     const [title, setTitle] = useState(project.projectTitle);
     const [status, setStatus] = useState(project.projectStatus);
+    const [statusColor, setStatusColor] = useState(getStatusColor(project.projectStatus));
     //set members資料
     const [members, setMembers] = useState(Array.isArray(project.projectMember) ? project.projectMember : [project.projectMember]); 
     const [assignedMembers, setAssignedMembers] = useState<string[]>([]);
@@ -44,6 +58,8 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
     const [showMemberInput, setShowMemberInput] = useState(false)
     const [newMember, setNewMember] = useState('');
 
+    //Visible
+    const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
 
     
@@ -181,6 +197,13 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
     const handleStatus = () => {
         OnUpdate(project.id, {projectStatus: status})
     }
+    //轉換狀態顏色
+    const handleStatusColor = (e:React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setStatus(value)
+        setStatusColor(getStatusColor(value))
+    }
+   
     //編輯開始日程
     const handleStartDate = () =>{
         OnUpdate(project.id, {projectDateStart: startDate})
@@ -199,6 +222,7 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
             <div className='project'>
                 <div className='project-list'>
                     <div className='project-list-box'>
+
                         {/* Title */}
                         
                         <button className='project-toggleBut'
@@ -209,21 +233,19 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
                                 src="/images/toggle.svg" alt="project toggle" width={20} height={20}/>
                         </button>
                         <input className='project-title' placeholder='Title' value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}></input>
+                        
+                        
+                        
                         {/* Status */}
 
                         <div className='project-status'>
-                            <Image className='project-statusImg' src="/images/projectStatus.svg" alt="project status" width={20} height={20}/>
-                            <select id="" value={status} onChange={(e) => setStatus(e.target.value)} onBlur={handleStatus}>
+                            <label className="project-status-color" htmlFor="status"  style={{backgroundColor:statusColor}}></label>
+                            <select id="status" value={status} onChange={handleStatusColor} onBlur={handleStatus}>
                                 <option value="Unstarted">Unstarted</option>
                                 <option value="Processing">Processing</option>
                                 <option value="Done">Done</option>
                             </select>
                         </div>
-                        
-
-
-                        {/* Member !!!!這邊要另外處理member的部分*/}
-
                         
 
 
@@ -282,9 +304,19 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
                             />
                         </div>
                         
-                        <button className='project-delete' onClick={OnDelete}>
-                           <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
-                        </button>
+                        <div className='project-delete' onClick={() => setIsDeleteVisible(prev => !prev)}>⋮ 
+                            {isDeleteVisible?
+                            <>
+                                <div className='project-delete-block' onClick={OnDelete}>
+                                <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
+                                </div>
+                                <div className="overlay"></div>
+                            </>
+                            :
+                            <></>
+                            }
+
+                        </div>
                         
                         
                     </div>

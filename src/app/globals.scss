@@ -7,36 +7,6 @@ $primary-backgroundColor: #FFF9F4;
 $grey: #5B5B5B;
 $greyLight: #C4C4C4;
 
-@media (max-width: 768px) {
-    
-  .main{
-      margin-top: 60px !important;
-  }
-  .sidebar-phone{
-      display: flex !important;
-  }
-  .sidebar-phone-close{
-      display: block!important;
-  }
-  .sidebar{
-     transform: translateX(-100%)!important;
-     position: fixed !important;
-     z-index: 10000 !important;
-  }
-  .sidebar-phone-show{
-      transform: translateX(0)!important;
-  }
-  .project-memberList{
-    width: 200px!important;
-  }
-  .project-delete{
-    top: 2% !important;
-    right: 1% !important;
-  }
-  .list input{
-    width: 130px !important;
-  }
-}
 
 
 
@@ -383,4 +353,12 @@ body{
 }
 .fc-neutral-bg{
   background-color: #a25e52;
+}
+
+.fc .fc-daygrid-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100%;
 }

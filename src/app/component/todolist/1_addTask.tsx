@@ -14,9 +14,9 @@ interface Task {
     taskDescription: string;
     taskOwner: string | null;
     calendarId: string;
-    createdAt: string;  
-    projectTitle: string;
     projectId: string;
+    projectTitle: string;
+    createdAt: string;  
 }
 
 interface TaskProps{
@@ -65,7 +65,7 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks}) => {
     }
     return (
         <>
-        <input type="text" placeholder='To do ....' value={title} onChange={(e)=> setTitle(e.target.value)}/>
+        <input className="tasklist-addTask-input" type="text" placeholder='To do ....' value={title} onChange={(e)=> setTitle(e.target.value)}/>
         <button className="tasklist-addTask" onClick={handleAddTask} >Add Task</button>
         </>
     );

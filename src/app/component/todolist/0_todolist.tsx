@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { useAuth } from '../auth/authContext';
 import { collection, deleteDoc, doc, getDocs, query,updateDoc,where } from 'firebase/firestore';
 import AddTask from './1_addTask';
 import TaskList from './1_taskList';
 import { db } from '../../../../firebase';
+import Image from 'next/image';
 
 
 interface Project {
@@ -34,15 +35,21 @@ interface Task {
     createdAt: string;  
 }
 
-const TodoList = () => {
+interface TodoListProps{
+    tasks: Task[]|[];
+    setTasks: Dispatch<SetStateAction<Task[]|[]>>;
+    setIsTodlistShow: Dispatch<SetStateAction<boolean>>;
+}
+
+const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => {
     const {currentUser, loadingUser} = useAuth();
-    const [tasks, setTasks] = useState<Task[]>([])
     const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
         const fetchTask = async() => {
             if(!loadingUser && currentUser){
                 try{
+                    console.log('這裡有東西嗎？')
                     //沒有在project裡的task
                     const q = query(collection(db, `noProject/${currentUser.uid}/task`))
                     const noProjetTaskSnapshot = await getDocs(q);
@@ -50,7 +57,8 @@ const TodoList = () => {
                         taskId: doc.id,
                         ...(doc.data() as Task)
                     }));
-                    if(noProjectTask){
+
+                    if(noProjectTask.length > 0){
                         setTasks(pre => pre? [...pre, ...noProjectTask]: noProjectTask)
                     }
                     //在project且被assigned的task
@@ -99,7 +107,7 @@ const TodoList = () => {
         }
         fetchTask();
     },[loadingUser,currentUser])
-
+    console.log('這邊這邊',tasks)
     //標題等更新
     const handleUpdateTask = async(taskRefString:string, updatedData:Partial<Task>,taskId: string) =>{
         try{
@@ -125,11 +133,17 @@ const TodoList = () => {
         }
 
     }
+
     return (
         <>
         <div className='list'>
             <h1>To Do List</h1>
-            <hr />
+                <div >
+                <Image 
+                        onClick={()=>{setIsTodlistShow(pre => !pre)}}
+                        className='task-toggleImg' 
+                        src="/images/toggle.svg" alt="task toggle" width={20} height={20}/>
+                </div>
                 <div className="list-filter">
                     <select name="" id="">Project</select>
                     <select name="" id=""></select>
@@ -145,16 +159,17 @@ const TodoList = () => {
                         onDelete = {handleDeleteTask}
                         />
                 </div>
-                    
-                {/* 新增task */}
                 <hr />
+                {/* 新增task */}
+                
                     <AddTask
                     currentUser = {currentUser}
                     loadingUser = {loadingUser}
                     setTasks = {setTasks}
                 />
+                
          </div>
-            
+        
             
         
         </>

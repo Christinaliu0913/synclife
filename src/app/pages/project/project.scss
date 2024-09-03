@@ -5,7 +5,7 @@ $hover-color: #F9F9F9;
 $primary-backgroundColor: #FFF9F4;
 $grey: #5B5B5B;
 $greyLight: #C4C4C4;
-
+$blue: #5b95ad;
 .main{
     max-width: 100%;
     margin: 0px;
@@ -104,7 +104,11 @@ $greyLight: #C4C4C4;
     color: $grey;
     
 }
-
+.project-status-color{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
 .project-status{
     display: flex;
     align-items: center;
@@ -117,6 +121,7 @@ $greyLight: #C4C4C4;
         margin:4px;
     }
 }
+
 
 .project-member{
     display: flex;
@@ -275,14 +280,41 @@ $greyLight: #C4C4C4;
 
 .project-delete{
     position: absolute;
-    top: 42%;
+    top: 1%;
     right: 1%;
     transition: all 0.2s ease;
+    width: 10px;
     height: 30px;
     border-radius: 5px;
     background-color: #ffffff00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bolder;
     &:hover{
         background-color: $hover-color;
+        color: $grey;
+        width: 12px;
+        height: 32px;
+    }
+}
+.project-delete-block{
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+    &:hover{
+        background: $greyLight;
+        width: 33px;
+        height: 33px;
     }
 }
 .project-toggleBut{
@@ -362,6 +394,7 @@ $greyLight: #C4C4C4;
 
     
 }
+
 .project-content-addCat .category-text{
     display: none;
 }
@@ -380,6 +413,7 @@ $greyLight: #C4C4C4;
     margin-right: 10px;
     display: flex;
     flex-direction: column;
+    width: 280px;
     input{
         input::placeholder {
             color: $greyLight; 
@@ -390,34 +424,67 @@ $greyLight: #C4C4C4;
 
 .categoryTitle{
     display: flex;
+
+    .categoryTitle-input{
+        font-size: 16px;
+        flex: auto;
+        height: 30px;
+        border: 1px solid $primary-color;
+        border-radius: 5px;
+        box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+    }
     input::placeholder {
         color: $greyLight; 
         opacity: 0.8; 
     }
     button{
-        flex: auto;
-        padding: 5px;
+        position: relative;
+        padding: 0px;
         margin: 5px;
-        font-size: 13px;
+        font-size: 16px;
         color: $greyLight;
         transition: all 0.3s ease;
         border-radius: 5px;
+        width: 20px;
+        font-weight: bold;
+        background-color: #ffffff00;
         &:hover{
-            font-size:15px;
+            font-size:18px;
             color:$grey;
+            background: $hover-color;
         }
+        
     }
 }
-
-.categoryTitle-input{
-    font-size: 16px;
-    max-width: 200px;
-    width: 200px;
+.category-delete-block{
+    position: absolute;
+    top: 20px;
+    left: -20px;
     height: 30px;
-    border: 1px solid $primary-color;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
     border-radius: 5px;
+    z-index: 1000;
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+    &:hover{
+        background: $greyLight;
+        width: 33px;
+        height: 33px;
+    }
 }
+.categoryt-overlay{
+    position:fixed;
+    top: 0;
+    left: 0;
+    width: 200vh;
+    height: 200vh;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
 
 .category-addTask{
     margin: 5px;

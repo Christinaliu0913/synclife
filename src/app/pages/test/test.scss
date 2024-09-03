@@ -7,6 +7,7 @@ $primary-backgroundColor: #FFF9F4;
 $grey: #5B5B5B;
 $greyLight: #C4C4C4;
 
+
 .body{
     max-width: 100%;
     margin: 0px;
@@ -17,19 +18,23 @@ $greyLight: #C4C4C4;
     
   }
 
+h1{
+    color: $grey;
+}
 .main{
     display: flex;
 }
 .list{
 margin: 15px;
-max-width: 1000px;
+min-width: 365px;
 font-size: 16px;
+position: relative;
+z-index: 24;
     input{
         border: none;
         border-radius: 5px;
-        height: 30px;
         margin: 8px;
-        font-size: 16px;
+        font-size: 12px;
         text-indent: 5px;
         box-shadow: 0px 2px 5px rgba(63, 63, 63, 0.1);
     }
@@ -56,19 +61,19 @@ font-size: 16px;
 }
 
 .tasklist-check + label {
-    display: inline-block; /* 使用 inline-block 而不是 absolute */
-    width: 25px; /* 自定义复选框的宽度 */
-    height: 25px; /* 自定义复选框的高度 */
+    display: inline-block; 
+    width: 20px; 
+    height: 20px; 
     border: 2px solid #ccc;
     border-radius: 50%;
     background: #fff;
-    margin-right: 10px; /* 添加右边距以分隔文本 */
+    margin-right: 10px; 
     cursor: pointer;
-    position: relative; /* 位置相对，以便可以使用伪元素 */
+    position: relative; 
 }
 
 .tasklist-check:checked + label {
-    background-color: $greyLight; /* 替换 $greyLight 为实际的颜色值 */
+    background-color: $greyLight; 
     border-color: $greyLight;
 }
 
@@ -81,39 +86,104 @@ font-size: 16px;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
     position: absolute;
-    left: 9px;
-    top: 4px;
+    left: 6px;
+    top: 1px;
 }
+//taskList の中身-----------
+.task-toggleImg{
+
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    transform: rotate(-90deg);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    &:hover{
+        // background-color: $greyLight;
+        // box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+        width: 25px;
+        height: 25px;
+    }
+}
+
 .tasklist-title-container{
     display: flex;
 
 }
+.tasklist-title{
+    width: 80px;
+    height: 23px;
+}
+
 .tasklist-projectSelect{
     cursor: pointer;
     border: none;
+    width: 70px;
     background-color: #ffffff00;
     &:hover{
         background-color: $minor-fontColor;
     }
 }
 .tasklist-projectImg{
-    margin-right: 5px;
+    margin-right: 2px;
     position: relative;
     top: 12px
+}
+.tasklist-date{
+    width:auto;
+    font-size: 2px;
+    transform: scale(0.9);
+    transform-origin: left;
+    margin: 2px;
 }
 
 .tasklist-delete{
     position: relative;
     top: 10px;
-    width: 25px;
+    left: -8px;
+    width: 10px;
     height: 25px;
+    font-weight: bold;
     color: $greyLight;
     transition: all 0.2s ease;
+    align-items: center;
+    background-color: #ffffff00;
+    cursor: pointer;
     &:hover{
         color: $grey;
         width: 30px;
         height: 30px;
     }
+}
+.tasklist-delete-block{
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+    &:hover{
+        background: $greyLight;
+        width: 33px;
+        height: 33px;
+    }
+}
+
+.tasklist-overlay{
+    position:fixed;
+    top: 0;
+    left: 0;
+    width: 200vh;
+    height: 200vh;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .overlay{
@@ -137,4 +207,49 @@ font-size: 16px;
         width: 85px;
         height: 35px;
     }
+    
+}
+
+.tasklist-addTask-input{
+    background: #fff;
+    height: 27px;
+    width: 120px;
+    height: 30px;
+    border-radius: 5px;
+}
+
+.todolist-toggle{
+    height: 600px;
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: absolute;
+    width: 370px;
+    top: 56px;
+    left: 200px;
+    padding: 5px;
+    background-color: $primary-backgroundColor;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    z-index: 40;
+    transition: transform 0.3s ease-out;
+    
+}
+
+.todolist-toggle-hidden{
+    transform: translateX(-200%);
+    height: 600px;
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: fixed;
+    width: 370px;
+    top: 50px;
+    left: 200px;
+    padding: 5px;
+    background-color: $primary-backgroundColor;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    z-index: 40;
+    transition: transform 0.3s ease-out;
 }

@@ -335,8 +335,8 @@ const TaskListProject:React.FC<TaskListProjectProps> = ({ task, projects}) => {
     }
     return(
         <>
-            <div>
-            <Image className='tasklist-projectImg' src="/images/Folder_light.svg" alt="task project" width={20} height={20}/>
+            <div className='tasklist-projectImg' >
+            <Image  src="/images/Folder_light.svg" alt="task project" width={15} height={15}/>
             </div>
             
             <select 

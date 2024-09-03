@@ -39,6 +39,8 @@ const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,O
     //task
     const [tasks, setTasks] = useState<Task[]>([]);
     const projectId = category.projectId;
+    //Visibal
+    const [isCatDeleteVisible, setIsCatDeleteVisible] = useState(false);
 
     
     //fetch task
@@ -104,8 +106,17 @@ const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,O
                     type="text" 
                     onChange={(e)=>setTitle(e.target.value)} 
                     onBlur={handleTitleBlur}/>
-                <button onClick={OnDelete}>
-                    Delete
+                <button onClick={()=>{setIsCatDeleteVisible(prev=> !prev)}}>
+                    ⋮
+                    {isCatDeleteVisible?
+                    (<>
+                        <div className="category-delete-block" onClick={OnDelete}>
+                            <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
+                        </div>
+                        <div className="categoryt-overlay"></div>
+                    </>):
+                    <></>
+                    }
                 </button>
             </div>
 

@@ -44,6 +44,8 @@ interface TaskProps{
 
 const TaskList:React.FC<TaskProps> = ({tasks,setTasks,onUpdate,projects,onDelete}) => {
 
+
+
     console.log('ck all tasks', tasks)
     return(
         

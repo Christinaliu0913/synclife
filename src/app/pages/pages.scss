@@ -9,6 +9,36 @@ $grey: #5B5B5B;
 $greyLight: #C4C4C4;
 
 
+@media (max-width: 768px) {
+    
+  .main{
+      margin-top: 60px !important;
+  }
+  .sidebar-phone{
+      display: flex !important;
+  }
+  .sidebar-phone-close{
+      display: block!important;
+  }
+  .sidebar{
+     transform: translateX(-100%)!important;
+     position: fixed !important;
+     z-index: 10000 !important;
+  }
+  .sidebar-phone-show{
+      transform: translateX(0)!important;
+  }
+  .project-memberList{
+    width: 200px!important;
+  }
+  .list input{
+    width: 130px !important;
+  }
+  .todolist-toggle{
+    left: 0px !important;
+  }
+}
+
 .pages-container {
     display: flex;
     
@@ -80,8 +110,11 @@ $greyLight: #C4C4C4;
     }
 }
 //----------------------normal----------------------
+.nav{
+  position: relative;
+}
 .sidebar{
-  z-index: 2;
+  z-index: 401;
   position: sticky;
   top: 0px;
   text-indent: 10px;
@@ -120,6 +153,7 @@ $greyLight: #C4C4C4;
           left: 10px;
           text-decoration: none;
           color:#ffffff;
+          cursor: pointer;
           &:hover{
             color: $minor-fontColor;
           }
@@ -134,6 +168,7 @@ $greyLight: #C4C4C4;
   }
   
 }
+
 
 
 .sidebarUser{

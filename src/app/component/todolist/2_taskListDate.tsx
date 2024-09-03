@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../auth/authContext";
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../../../../firebase";
+import Image from "next/image";
 
 interface Task {
     id: string;
@@ -29,7 +30,8 @@ const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
     const {currentUser} = useAuth();
     const [date, setDate] = useState(task.taskDate);
     const projectId = task.projectId
-    
+    const [isDeleteVisible, setDeleteVisible] = useState(false);
+
     const handleBlur = async(updateData: Partial<Task>) => {
         if(!currentUser){
             return;
@@ -68,7 +70,7 @@ const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
         }
         try{
             //如果有帶project的話
-                  
+            
             if(projectId){
                 const categoryQuery = query(collection(db,`project/${projectId}/category`));
                 const categorySnapshot = await getDocs(categoryQuery);
@@ -101,10 +103,22 @@ const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
                 onChange={(e) => setDate(e.target.value)}
                 onBlur={()=>handleBlur({taskDate: date})}
             />
-            <button
+            <div
                 className="tasklist-delete"
-                onClick={handleDeleteTask}
-            >x</button>
+                onClick={()=> setDeleteVisible(pre=> !pre)}
+                
+            >⋮
+            {isDeleteVisible?(
+                <>
+                    <div className="tasklist-delete-block" onClick={handleDeleteTask}>
+                        <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
+                    </div>
+                    <div className="tasklist-overlay"></div>
+                </>
+                
+            )
+            :<></>}
+            </div>
         </>
     )
 }
