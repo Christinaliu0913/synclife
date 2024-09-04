@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { User } from "firebase/auth";
 import { collection, deleteDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { db } from "../../../../firebase";
-import AddTask from "./1_addTask";
 import { useAuth } from "../auth/authContext";
 import Image from "next/image";
 import { tasks } from "googleapis/build/src/apis/tasks";

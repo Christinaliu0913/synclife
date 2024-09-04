@@ -40,9 +40,10 @@ interface TaskProps{
     onUpdate: (taskRefString: string, updatedData: Partial<Task>,taskId: string) => void;
     projects: Project[];
     onDelete: (taskRefString: string, taskId: string) => void;
+    setAllTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
-const TaskList:React.FC<TaskProps> = ({tasks,setTasks,onUpdate,projects,onDelete}) => {
+const TaskList:React.FC<TaskProps> = ({tasks,setTasks,onUpdate,projects,onDelete,setAllTasks}) => {
     
 
 
@@ -64,7 +65,8 @@ const TaskList:React.FC<TaskProps> = ({tasks,setTasks,onUpdate,projects,onDelete
                     key={`project-${task.id}`}
                     task={task}
                     projects = {projects}
-                    
+                    setAllTasks={setAllTasks}
+                    setTasks={setTasks}
                 />
                 
                 <TaskListDate
