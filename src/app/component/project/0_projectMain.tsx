@@ -6,6 +6,9 @@ import { useAuth } from '../auth/authContext';
 import { useEffect, useState } from "react";
 import { auth, db } from '../../../../firebase';
 import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+
+
 
 interface Project {
     id: string;
@@ -26,7 +29,7 @@ interface AddProjectProps {
 }
 const ProjectMain = () => {
     const { currentUser,loadingUser } = useAuth();
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [ projects, setProjects] = useState<Project[]>([]);
 
     //先fetch這個人的資料
     useEffect(()=>{

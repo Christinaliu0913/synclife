@@ -5,7 +5,7 @@ import AddTask from './1_addTask';
 import TaskList from './1_taskList';
 import { db } from '../../../../firebase';
 import Image from 'next/image';
-
+import TaskProjectFilter from './1_projectFilter';
 
 interface Project {
     id: string;
@@ -44,7 +44,10 @@ interface TodoListProps{
 const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => {
     const {currentUser, loadingUser} = useAuth();
     const [projects, setProjects] = useState<Project[]>([]);
-
+    //用來保存所有被filter前的所有tasks
+    const [allTasks, setAllTasks] = useState<Task[]|[]>([])
+    //若有filter project的狀態時，直接設置其project
+    const [selectedProject, setSelectedProject] = useState('');
     useEffect(() => {
         const fetchTask = async() => {
             if(!loadingUser && currentUser){
@@ -60,6 +63,7 @@ const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => 
 
                     if(noProjectTask.length > 0){
                         setTasks(pre => pre? [...pre, ...noProjectTask]: noProjectTask)
+                        setAllTasks(pre => pre? [...pre, ...noProjectTask]: noProjectTask)
                     }
                     //在project且被assigned的task
                     const withProjectQuery = query(collection(db,'project'), where('projectMember','array-contains',currentUser.email))
@@ -91,7 +95,7 @@ const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => 
                                 if(taskDataWithProTitle){
                                     console.log('projectproject', proj.projectTitle)
                                     setTasks(pre => pre?[...pre, ...taskDataWithProTitle]:taskDataWithProTitle)
-                                    
+                                    setAllTasks(pre => pre?[...pre, ...taskDataWithProTitle]:taskDataWithProTitle)
                                 }
                             }
                             
@@ -116,6 +120,9 @@ const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => 
             setTasks(prevTasks => (prevTasks ?? []).map(task => 
                 task.id === taskId ? { ...task, ... updatedData} : task
             ))
+            setAllTasks(prevTasks => (prevTasks ?? []).map(task => 
+                task.id === taskId ? { ...task, ... updatedData} : task
+            ))
         }catch(error){
             console.log('更新標題的時候出錯TODOLIST',error)
         }
@@ -127,13 +134,16 @@ const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => 
             await deleteDoc(taskRef);
             setTasks(prevTasks => (prevTasks?? []).filter(task => 
                 task.id !== taskId))
+            setAllTasks(prevTasks => (prevTasks?? []).filter(task => 
+                task.id !== taskId))
             console.log('已刪除task')
         }catch(error){
             console.log('刪除task時錯誤',error)
         }
 
     }
-
+    console.log('ck task', tasks)
+    console.log('ck all tasks',allTasks)
     return (
         <>
         <div className='list'>
@@ -144,10 +154,14 @@ const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => 
                         className='task-toggleImg' 
                         src="/images/toggle.svg" alt="task toggle" width={20} height={20}/>
                 </div>
-                <div className="list-filter">
-                    <select name="" id="">Project</select>
-                    <select name="" id=""></select>
-                </div>
+                <hr style={{marginRight:"10px"}} />
+                <TaskProjectFilter
+                    projects={projects}
+                    setTasks={setTasks}
+                    allTasks={allTasks}
+                    setSelectedProject={setSelectedProject}
+                    selectedProject={selectedProject}
+                />
                 
                 {/* task List*/}
                 <div >
@@ -157,15 +171,18 @@ const TodoList:React.FC<TodoListProps> = ({tasks,setTasks,setIsTodlistShow}) => 
                         projects = {projects}
                         onUpdate = {handleUpdateTask}
                         onDelete = {handleDeleteTask}
+                        setAllTasks={setAllTasks}
                         />
                 </div>
-                <hr />
+                <hr style={{marginRight:"10px"}} />
                 {/* 新增task */}
                 
                     <AddTask
-                    currentUser = {currentUser}
-                    loadingUser = {loadingUser}
-                    setTasks = {setTasks}
+                        currentUser = {currentUser}
+                        loadingUser = {loadingUser}
+                        setTasks = {setTasks}
+                        selectedProject = {selectedProject}
+                        setAllTasks={setAllTasks}
                 />
                 
          </div>

@@ -5,6 +5,7 @@ import { db } from "../../../../firebase";
 import AddTask from "./1_addTask";
 import { useAuth } from "../auth/authContext";
 import Image from "next/image";
+import { tasks } from "googleapis/build/src/apis/tasks";
 
 interface Task {
     id: string;
@@ -24,8 +25,10 @@ interface Task {
 interface TaskListProjectProps{
     task: Task;
     projects: any[];
+    setAllTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
-const TaskListProject:React.FC<TaskListProjectProps> = ({ task, projects}) => {
+const TaskListProject:React.FC<TaskListProjectProps> = ({ task, projects, setAllTasks,setTasks}) => {
     const [taskProject, setTaskProject] = useState('');
     const [newProject, setNewProject] = useState('');
     const [newProjectTitle, setNewProjectTitle] = useState('');
@@ -78,10 +81,23 @@ const TaskListProject:React.FC<TaskListProjectProps> = ({ task, projects}) => {
                 console.log('123123123123')
                 if(newProject === '0'){
                     await removeTaskFromProject(taskProject, currentUser);
+                    const noProject = ''
+                    setTasks(prev => prev.map(t => 
+                        t.id === task.id?{...t,projectId:'',prejectTitle:''}:t
+                    ))
+                    setAllTasks(prev => prev.map(t => 
+                        t.id === task.id?{...t,projectId:'',prejectTitle:''}:t
+                    ))
                 }
                 // 狀態1.2有選擇新的newProject
                 else if(taskProject !== newProject){
                     await moveTaskToNewProject(taskProject, newProject, newProjectTitle,currentUser);
+                    setTasks(prev => prev.map(t => 
+                        t.id === task.id?{...t,projectId:newProject,prejectTitle:newProjectTitle}:t
+                    ));
+                    setAllTasks(prev => prev.map(t => 
+                        t.id === task.id?{...t,projectId:newProject,prejectTitle:newProjectTitle}:t
+                    ));
                 }
                 // 狀態1.3沒有變更project
                 else{
@@ -92,6 +108,12 @@ const TaskListProject:React.FC<TaskListProjectProps> = ({ task, projects}) => {
                 console.log('1111111')
                 if(newProject){
                     await UpdateTaskProject(newProject, newProjectTitle, currentUser);
+                    setTasks(prev => prev.map(t => 
+                        t.id === task.id?{...t,projectId:newProject,prejectTitle:newProjectTitle}:t
+                    ));
+                    setAllTasks(prev => prev.map(t => 
+                        t.id === task.id?{...t,projectId:newProject,prejectTitle:newProjectTitle}:t
+                    ));
                 }
             }
         }catch(error){

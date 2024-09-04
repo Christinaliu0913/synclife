@@ -29,7 +29,7 @@ const AssignMember:React.FC<AssignMemberProps> = ({taskId,projectId,categoryId,m
     const [optionVisible, setOptionVisible] = useState(false);
     const [assignedMembers, setAssignedMembers] = useState<string[]>([]);
     const [notAssignedMembers, setNotAssignedMembers] = useState<string[]>([]);
-    console.log('ckckckc',members)
+    
 
     
     useEffect( ()=> {
@@ -117,13 +117,20 @@ const AssignMember:React.FC<AssignMemberProps> = ({taskId,projectId,categoryId,m
                 </div>
             </div>
             {optionVisible? (
-                <select onChange={handleAssignMember}>
-                    <option value="">Select a member</option>
-                    {notAssignedMembers?.map((member,index)=>(
-                        <option key={index} value={member}>{member}</option>
-                    ))}
+                <>
+                    <select 
+                        className="taskBlock-select"
+                        onChange={handleAssignMember}
+                    >
+                        <option value="">Select a member</option>
+                        {notAssignedMembers?.map((member,index)=>(
+                            <option key={index} value={member}>{member}</option>
+                        ))}
+                    
+                    </select>
+                    <div className="taskBlock-overlay" onClick={()=> setOptionVisible(false)}></div>
+                </>
                 
-                </select>
             ):
             <></>
 

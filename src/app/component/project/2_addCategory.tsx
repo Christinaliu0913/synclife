@@ -38,7 +38,7 @@ const AddCategory:React.FC<AddCategoryProps>= ({projectId, setCategories, catego
                 }
                 await setDoc(newDocRef, newCategory);
 
-                setCategories(categories => (categories? [...categories,{id: newDocRef.id,...newCategory}]:[{id: newDocRef.id,...newCategory}]));
+                setCategories(categories => (categories? [{id: newDocRef.id,...newCategory},...categories]:[{id: newDocRef.id,...newCategory}]));
                 
             }catch(error){
                 console.log('fetch category的時候錯誤',error);

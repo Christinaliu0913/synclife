@@ -24,7 +24,6 @@ const AuthCheck =  ({ children }: { children: ReactNode }) => {
             }
             
         }
-    
         
     },[currentUser, loadingUser, router]);
     

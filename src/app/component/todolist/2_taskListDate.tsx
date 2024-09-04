@@ -113,7 +113,7 @@ const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
                     <div className="tasklist-delete-block" onClick={handleDeleteTask}>
                         <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
                     </div>
-                    <div className="tasklist-overlay"></div>
+                    {/* <div className="tasklist-overlay"></div> */}
                 </>
                 
             )

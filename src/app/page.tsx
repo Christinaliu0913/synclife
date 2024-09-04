@@ -12,7 +12,11 @@ export default function Home() {
         
       </nav>
       <div className="hp-main">
-          <Image src='/images/logo.svg' alt="logo" width={400} height={200}></Image>
+        <div className="hp-logo" >
+          <Image className="hp-logo-text" src='/images/logo-text.svg' alt="logo" width={400} height={200}></Image>
+          <Image className="hp-logo-timer" src='/images/logo-timer.svg' alt="logo" width={90} height={90}></Image>
+        </div>
+          
           <div className="hp-main-subtitle"> 同步管理你的生活計畫</div>
           <SignIn />
       </div>     

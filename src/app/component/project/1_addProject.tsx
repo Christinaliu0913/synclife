@@ -55,7 +55,7 @@ const AddProject: React.FC<AddProjectProps> = ({setProjects,projects}) => {
                 await setDoc(newDocRef, newProject)
                 console.log('已新增一個Project了', newDocRef.id)
 
-                setProjects([...projects, { id: newDocRef.id, ...newProject }]);
+                setProjects([ { id: newDocRef.id, ...newProject },...projects]);
                 
             }
             console.log('no currentUser')

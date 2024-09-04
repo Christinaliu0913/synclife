@@ -104,7 +104,11 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     const [googleCalendars, setGoogleCalendars] = useState<any[]|null>([])
     //Project資料
     const [projects, setProjects] = useState<Project[]>([]);
+
+    //visible
+    const [isEventDeleteVisible, setIsEventDeleteVisible] = useState(false)
     console.log('確認selected日曆',selectedEvent)
+
     //處理選到evnet的資訊
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(()=>{
@@ -253,7 +257,19 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                 {/* 表單 */}
                 <div className='sidebar-title'>
                     <label htmlFor="title"></label>
-                    <input  type="text" id='title' value={title} onChange={(e)=>setTitle(e.target.value)} placeholder='Tilte'/>
+                    <input  type="text" id='title' value={title} onChange={(e)=>setTitle(e.target.value)} placeholder='Title'/>
+                    <button className="sidebar-delete1"onClick={()=>{setIsEventDeleteVisible(prev=> !prev)}}>
+                    ⋮
+                    {isEventDeleteVisible?
+                    (<>
+                        <div className="sidebar-delete-block" onClick={Ondelete}>
+                            <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
+                        </div>
+                        {/* <div className="sidebar-delete-overlay" onClick={()=>{setIsEventDeleteVisible(false)}}></div> */}
+                    </>):
+                    <></>
+                    }
+                </button>
                 </div>
                 
             

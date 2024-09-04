@@ -30,8 +30,8 @@ interface AddTaskProps {
 const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) => {
     const {currentUser,loadingUser} = useAuth();
     const taskTitle = '';
-    const taskStatus = 'unstarted';
-    const taskAssign = [''];
+    const taskStatus = 'Unstarted';
+    const taskAssign:string[] = [];
     const taskNotAssign = ['']
     const taskDescription = '';
     const taskDate = new Date().toISOString();//應該直接設置今天
@@ -62,7 +62,7 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
                 await setDoc(newDocRef, newTask)
                 console.log('已新增一個task了', newDocRef.id,`project/${projectId}/category/${categoryId}/task`)
 
-                setTasks(tasks => (tasks ? [...tasks, newTask] : [newTask]));
+                setTasks(tasks => (tasks ? [newTask,...tasks] : [newTask]));
             }
             console.log('no currentUser')
         }

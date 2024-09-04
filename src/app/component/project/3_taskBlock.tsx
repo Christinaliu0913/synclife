@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AssignMember from './member/taskAssign_Member';
+import Image from 'next/image';
 
 interface Task {
     id: string;
@@ -13,6 +14,19 @@ interface Task {
     calendarId: string;
     projectId: string;
     createdAt: string;  
+}
+
+const getStatusColor = (status: string): string => {
+    switch(status){
+        case "Unstarted":
+            return "#5b95ad" ;
+        case "Processing":
+            return "#C07767";
+        case "Done":
+            return "#5B5B5B"
+        default:
+            return 'none';
+    }
 }
 
 interface TaskBlockProps {
@@ -30,10 +44,21 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
     const [status, setStatus] = useState(task.taskStatus);
     const [assign, setAssign] = useState(task.taskAssign);
     const [date, setDate] = useState(task.taskDate?.slice(0,10));
-    const [description,setDescription]= useState(task.taskDescription)
+    const [description,setDescription]= useState(task.taskDescription);
 
+    //status color
+    const [taskStatusColor, setTaskStatusColor] = useState(getStatusColor(task.taskStatus))
+    //Note 
+    const textAreaRef = useRef<HTMLTextAreaElement |null>(null);
+    const [isFocus, setIsFocus] = useState(false);
+    //visible
+    const [isTaskDeleteVisible, setIsTaskDeleteVisible] = useState(false)
+    //調整textarea高度
+    useEffect(()=>{
+        adjustNoteHeight();
+    },[description])
 
-    //----編輯Task的內容----
+    //-------------編輯Task的內容----------
     const handleTitleBlur = () =>{
         OnUpdate(task.id, {taskTitle: title})
     }
@@ -42,28 +67,65 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
         OnUpdate(task.id, {taskStatus: status})
     }
 
+    //轉換狀態顏色
+    const handleTaskStatusColor = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setStatus(value)
+        setTaskStatusColor(getStatusColor(value))
+
+    }
+
     const handleDate = () =>{
         OnUpdate(task.id, {taskDate: date})
     }
+
     const handleDescription = () =>{
         OnUpdate(task.id, {taskDescription: description})
     }
-
+    //調整Note的大小
+    const adjustNoteHeight = () => {
+        if(textAreaRef.current){
+            textAreaRef.current.style.height = 'auto';
+            textAreaRef.current.style.height = textAreaRef.current.scrollHeight +'px';
+        }
+        
+    }
+    const adjustNoteHeightClose = () => {
+        if(textAreaRef.current){
+            textAreaRef.current.style.height = '30px';
+        }
+        
+    }
+    console.log('note',isFocus)
     return(
         <div className="taskBlock">
 
-            <div>
+            <div className='taskTitle'>
                 <input type="text" placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}/>
+                <button onClick={()=>{setIsTaskDeleteVisible(prev=> !prev)}}>
+                    ⋮
+                    {isTaskDeleteVisible?
+                    (<>
+                        <div className="category-delete-block" onClick={()=>OnDelete(task.id)}>
+                            <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
+                        </div>
+                        <div className="categoryt-overlay"></div>
+                    </>):
+                    <></>
+                    }
+                </button>
             </div>
             
-
-            <label htmlFor="status"></label>
-            <select name="" id="" value={status} onChange={(e) => setStatus(e.target.value)} onBlur={handleStatus}>
-                <option value="Unstarted">  Unstarted</option>
-                <option value="Processing">  Processing</option>
-                <option value="Done">  Done</option>
+            <div className='taskStatus'>
+                <label className='taskStatus-color' htmlFor="status" style={{backgroundColor:taskStatusColor}}></label>
+                <select className="taskStatus-select" name="" id="" value={status} onChange={handleTaskStatusColor} onBlur={handleStatus}>
+                    <option value="Unstarted">  Unstarted</option>
+                    <option value="Processing">  Processing</option>
+                    <option value="Done">  Done</option>
             </select>
 
+            </div>
+            
 
             <div>
                 <label htmlFor="taskDate" ></label>
@@ -88,16 +150,28 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
             
             <div>
                 <label htmlFor="description"></label>
-                <input 
-                    className='taskNote'
-                    type="text" 
+                <textarea 
+                    ref={textAreaRef}
+                    className={`taskNote ${isFocus ? 'expand' : 'collapsed'}`}
                     placeholder="Note" 
                     value={description}
-                    onChange = {(e) => setDescription(e.target.value)}
-                    onBlur = {handleDescription}
+                    style={{fontSize:'12px'}}
+                    onChange = {(e) => {
+                        setDescription(e.target.value);
+                        adjustNoteHeight();
+                     }}
+                    onBlur = {(e)=>{
+                        setIsFocus(false);
+                        OnUpdate(task.id, {taskDescription: e.target.value});
+                        adjustNoteHeightClose();
+                    }}
+                    onFocus={()=>{
+                        adjustNoteHeight();
+                        setIsFocus(true)
+                    }}
                 />
             </div>
-            <button className='taskDelete' onClick={()=>OnDelete(task.id)}>Delete</button>
+            {/* <button className='taskDelete' onClick={()=>OnDelete(task.id)}>Delete</button> */}
         </div>
     )
 }

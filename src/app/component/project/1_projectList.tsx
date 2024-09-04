@@ -6,6 +6,7 @@ import CategoryContent from './2_categoryContent'
 import MemberList from './member/member_List'
 import Image from 'next/image';
 
+
 import 'flatpickr/dist/themes/material_green.css'
 
 interface Project {
@@ -60,7 +61,7 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
 
     //Visible
     const [isDeleteVisible, setIsDeleteVisible] = useState(false);
-
+    const [isContentVisible,setIsContentVisible] = useState<boolean>(false);
 
     
     //fetch category的資料
@@ -213,7 +214,7 @@ const ProjectList: React.FC<ProjectListProps>  = ({project,OnDelete,OnUpdate}) =
         OnUpdate(project.id, {projectDateEnd: endDate})
     }
     //-------------------------切換狀態-------------------------------
-    const [isContentVisible,setIsContentVisible] = useState<boolean>(false);
+
     const toggleContent = () => {
         setIsContentVisible(!isContentVisible);
     }

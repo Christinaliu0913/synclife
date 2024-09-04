@@ -8,18 +8,21 @@ import { useEffect } from "react";
 
 
 const SignOut = () => {
-    const { currentUser,loadingUser } = useAuth();
     const router = useRouter()
+
+
     const logOutwithGoogle = async()=> {
         try{
             await signOut(auth);            
             Cookies.remove('googleToken',{path:'/'});
-            console.log('已登出');
-            router.push('/');
+            
+            window.location.reload();
+            
         }catch(error){
             console.error('Error logging out',error);
         }
     }
+
 
 
     return(
