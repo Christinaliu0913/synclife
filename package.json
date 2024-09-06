@@ -15,7 +15,8 @@
     "@fullcalendar/react": "^6.1.15",
     "@fullcalendar/resource-timeline": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
-    "firebase": "^10.12.5",
+    "@reduxjs/toolkit": "^2.2.7",
+    "firebase": "^10.13.1",
     "flatpickr": "^4.6.13",
     "fullcalendar": "^6.1.15",
     "gapi-script": "^1.2.0",
@@ -29,7 +30,8 @@
     "react-flatpickr": "^3.10.13",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
-    "sass": "^1.77.8"
+    "sass": "^1.77.8",
+    "undici": "^6.19.8"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

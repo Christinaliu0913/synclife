@@ -1,8 +1,9 @@
+
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.scss";
-import { AuthProvider } from './component/auth/authContext'
-import AuthCheck from './component/auth/authCheck'
+import ClientWrapper from "./ClientWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,18 +14,12 @@ export const metadata: Metadata = {
 
 
 //建立全域
-export default function RootLayout({
-  children,
-  }:Readonly<{
-    children: React.ReactNode;
-  }>) {
+export default function RootLayout({children,}:Readonly<{children: React.ReactNode;}>) {
+
   return (
     <html lang="en">
       <body className={inter.className}>
-      <AuthProvider>
-        <AuthCheck>{children}</AuthCheck>
-      </AuthProvider>
-        
+      <ClientWrapper>{children}</ClientWrapper>
       </body>
     </html>
   );

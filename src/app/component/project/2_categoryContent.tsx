@@ -34,7 +34,7 @@ interface CategoryContentProps {
     updatedMembers: (assignedMembers: string[], notAssignedMembers: string[]) => void;
 }
 
-const CategoryContent:React.FC<CategoryContentProps> = ({key,category,OnDelete,OnUpdate,members,updatedMembers}) => {
+const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpdate,members,updatedMembers}) => {
     const [title, setTitle] = useState(category.categoryTitle)
     //task
     const [tasks, setTasks] = useState<Task[]>([]);

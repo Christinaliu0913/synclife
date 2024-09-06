@@ -96,7 +96,7 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
         }
         
     }
-    console.log('note',isFocus)
+
     return(
         <div className="taskBlock">
 

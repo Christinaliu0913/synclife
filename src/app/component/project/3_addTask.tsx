@@ -38,7 +38,6 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
     const taskOwner: string | null = currentUser?.email ?? null; 
     const calendarId = '';
     
-    console.log('checasdfasdfadfilllll',projectId)
     
 
     //新增一個Task

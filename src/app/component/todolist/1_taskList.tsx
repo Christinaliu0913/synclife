@@ -6,6 +6,8 @@ import TaskListProject from './2_taskListProject';
 import TaskListTitle from './2_taskListTitle';
 import TaskListDate from './2_taskListDate';
 import { useAuth } from '../auth/authContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateTasksAsync, deleteTasksAsync } from '@/features/tasksSlice';
 
 interface Project {
     id: string;

@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useAuth } from '../auth/authContext';
 import SignOut from '../auth/signOut'
 import Image from 'next/image';
-import TodoListToggle from '../todolist/0_todolistMain';
+import TodoListToggleTest from '../todolist/todolistTest/0_0todlistMain';
 
 interface Task {
     id: string;
@@ -83,11 +83,9 @@ const Navigation = () => {
                     
             </div>
             <div>
-                <TodoListToggle
+                <TodoListToggleTest
                     setIsTodlistShow={setIsTodlistShow}
                     isTodolistShow={isTodolistShow}
-                    tasks={tasks}
-                    setTasks={setTasks}
                 />
             </div>
         </>
