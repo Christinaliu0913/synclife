@@ -113,7 +113,7 @@ export default function Home() {
         </div>
         <div className="hp-main-actionCall">
           <div style={{marginBottom:'20px'}}> Discover  how  SyncLife  can help  <br></br>
-             you  build  a  better life</div>
+             you  build  a  better life !</div>
               <SignIn/>
         </div>
             
