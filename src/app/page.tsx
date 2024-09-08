@@ -36,7 +36,7 @@ export default function Home() {
             <h1>Less is more.</h1>
             <p > SyncLife saves you the time spent switching between different devices, helping you stay more focused and efficient!</p>
             <div className="explain-iconContainer">
-              <Image  className="explain-icon" src='/images/clock.svg' alt="logo" width={70} height={70}></Image>
+              <Image  className="explain-icon" src="/images/time-clock.svg" alt="logo" width={70} height={70}></Image>
             </div>
           </div>
           <div className="explain-main">
@@ -114,7 +114,7 @@ export default function Home() {
         <div className="hp-main-actionCall">
           <div style={{marginBottom:'20px'}}> Discover  how  SyncLife  can help  <br></br>
              you  build  a  better life !</div>
-              {/* <SignIn/> */}
+              <SignIn/>
         </div>
             
         <div className="hp-footer"> 
