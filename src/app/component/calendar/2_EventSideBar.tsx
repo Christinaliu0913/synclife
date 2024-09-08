@@ -4,11 +4,12 @@ import addEventToGoogleCalendar from './2_addNewEvent';
 import { gapi } from 'gapi-script';
 import readEvent from './3_readEvent';
 import ProjectOption from './4_projectOption';
-import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc,updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../../../firebase';
 import { useAuth } from '../auth/authContext';
 import AddorEditProjectTask from './3_addprojectTask';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
 
 interface Project {
     id: string;
@@ -173,10 +174,9 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
         }
         fetchProjects();
     },[currentUser,loadingUser])
-
-    //新增到google calendar上
+    
     const handleSave = async() => {
-        const newEventData : EventData ={
+        const newEventData : any ={
             title : title || '', 
             start, 
             end, 
@@ -187,27 +187,61 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             id: selectedEventId? selectedEventId : null
         };
         const endTimeSet = end.slice(0,10);
-        console.log('newEventData',newEventData);
         
 
         try{
-            console.log('cat創立',project)
-
-            await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
-            //將資料傳給google
-            const addedEvent = await addEventToGoogleCalendar(newEventData);
-            
-            if(addedEvent){
-                const renewEvents = await readEvent(currentUser,tasks);
-                if(renewEvents){
-                    setEvents(renewEvents);
-                }else{
-                    console.log('新增或編輯新實踐時更新資料錯誤')
-                }
-
-                //！！！！！！！！要修改這曆有關要怎麼把project也跟新進去！！！
+            //先確認有沒有連到google calendar
+            const googleToken = Cookies.get('googleToken');
+            if(googleToken){
+                await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
                 
+                //將資料傳給google
+                const addedEvent = await addEventToGoogleCalendar(newEventData);
+
+                if(addedEvent){
+                    const renewEvents = await readEvent(currentUser,tasks);
+                    if(renewEvents){
+                        setEvents(renewEvents);
+                    }else{
+                        console.log('新增或編輯新實踐時更新資料錯誤')
+                    }
+                    //！！！！！！！！要修改這曆有關要怎麼把project也跟新進去！！！
+                }
+            }else{
+                console.log('without google calendar auth, save in local');
+                const newEventRef = doc(collection(db, `event/${currentUser?.uid}/event`))
+                await setDoc(newEventRef,{
+                    title: title || '',
+                    start: start,
+                    end: end,
+                    checkAllDay: checkAllDay,
+                    description: description || '',
+                    taskStatus: 'Unstarted',
+                    projectTitle: newProject || '',
+                    projectId: projectId || '',
+                    createdAt: new Date().toISOString()
+                })
+
+                const newTask = {
+                    id: newEventRef.id,
+                    title: title || '',
+                    start: start,
+                    end: end,
+                    allDay: checkAllDay,
+                    description: description || '',
+                    taskStatus: 'Unstarted',
+                    projectTitle: newProject || '',
+                    projectId: projectId || '',
+                    calendarType: 'local'
+                };
+
+                setEvents(prevEvents => [...prevEvents, newTask]);
             }
+
+
+            
+            
+            
             
 
             //儲存資料後關閉視窗
@@ -218,6 +252,51 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
         }
 
     };
+
+    //新增到google calendar上
+    // const handleSave = async() => {
+    //     const newEventData : EventData ={
+    //         title : title || '', 
+    //         start, 
+    //         end, 
+    //         checkAllDay, 
+    //         calendar: calendar || 'default', 
+    //         description, 
+    //         newProject, 
+    //         id: selectedEventId? selectedEventId : null
+    //     };
+    //     const endTimeSet = end.slice(0,10);
+    //     console.log('newEventData',newEventData);
+        
+
+    //     try{
+    //         console.log('cat創立',project)
+
+    //         await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
+    //         //將資料傳給google
+    //         const addedEvent = await addEventToGoogleCalendar(newEventData);
+            
+    //         if(addedEvent){
+    //             const renewEvents = await readEvent(currentUser,tasks);
+    //             if(renewEvents){
+    //                 setEvents(renewEvents);
+    //             }else{
+    //                 console.log('新增或編輯新實踐時更新資料錯誤')
+    //             }
+
+    //             //！！！！！！！！要修改這曆有關要怎麼把project也跟新進去！！！
+                
+    //         }
+            
+
+    //         //儲存資料後關閉視窗
+    //         onClose();
+
+    //     }catch(error){
+    //         console.log('新增日曆時出錯',error);
+    //     }
+
+    // };
 
    const handleAllDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCheckAllDay(e.target.checked);

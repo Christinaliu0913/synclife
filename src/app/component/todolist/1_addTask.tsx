@@ -32,7 +32,7 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
 
     const [title,setTitle] = useState('')
     const taskStatus = 'unstarted';
-    const taskAssign = [''] ;
+    const taskAssign:string[] = [];
     const taskNotAssign = ['']
     const taskDescription = '';
     //const taskDate = new Date().toISOString().slice(0,10);//應該直接設置今天

@@ -8,6 +8,8 @@ import { AppDispatch } from '@/store'
 import { useSelector } from "react-redux";
 import { RootState } from '@/store';
 import { Task } from "@/types/types";
+import { addProjects } from "@/features/projectsSlice";
+import { addCategories, updateCategories } from "@/features/categoriesSlice";
 
 
 interface TaskProps{
@@ -22,8 +24,8 @@ const AddTaskTest:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
     const selectedProject = useSelector((state: RootState) => state.tasks.selectedProject);
 
     const [title,setTitle] = useState('')
-    const taskStatus = 'unstarted';
-    const taskAssign = [''] ;
+    const taskStatus = 'Unstarted';
+    const taskAssign:string[] = [];
     const taskNotAssign = ['']
     const taskDescription = '';
     //const taskDate = new Date().toISOString().slice(0,10);//應該直接設置今天
@@ -31,9 +33,11 @@ const AddTaskTest:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
     const taskOwner: string | null = currentUser?.email ?? null; 
     const calendarId = '';
     const projectId = selectedProject? selectedProject:'';
+   
+    
+    //project setting 
     const projectTitle = '';
     
-   
 
     const handleAddTask = async() => {
         if(!loadingUser){
@@ -52,11 +56,12 @@ const AddTaskTest:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                             taskOwner,
                             calendarId,
                             createdAt: new Date().toISOString(),
+                            categoryId:'',
                             projectId,
                             projectTitle
                     };
 
-                    dispatch(addTasksAsync({newDocRef, newTask, selectedProject, currentUser}));
+                    dispatch(addTasksAsync({newDocRef, newTask}));
                     setTitle('');
                     
                 }
@@ -86,10 +91,11 @@ const AddTaskTest:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                                     taskOwner,
                                     calendarId,
                                     createdAt: new Date().toISOString(),
+                                    categoryId:currentCatId,
                                     projectId,
                                     projectTitle
                             }
-                            dispatch(addTasksAsync({newDocRef, newTask, selectedProject, currentUser}));
+                            dispatch(addTasksAsync({newDocRef, newTask}));
                             setTitle('');
 
                 
@@ -104,7 +110,6 @@ const AddTaskTest:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                                     createAt: new Date().toISOString(),
                                     projectId: selectedProject
                             }
-                            await setDoc(newDocRefCat, newCategory);
                             const currentCatId = newCategory.id;
                             const newDocRef = doc(collection(db, `project/${selectedProject}/category/${currentCatId}/task`));
                             const newTask:Task = {
@@ -118,10 +123,12 @@ const AddTaskTest:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                                     taskOwner,
                                     calendarId,
                                     createdAt: new Date().toISOString(),
+                                    categoryId:currentCatId,
                                     projectId,
                                     projectTitle
                             }
-                            dispatch(addTasksAsync({newDocRef, newTask, selectedProject, currentUser}));
+                            dispatch(addTasksAsync({newDocRef, newTask}));
+                            dispatch(addCategories({newDocRefCat,newCategory}));
                             setTitle('');
                             
                         }catch(error){

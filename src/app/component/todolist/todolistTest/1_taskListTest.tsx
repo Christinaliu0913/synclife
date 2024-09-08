@@ -10,24 +10,31 @@ import TaskListTitleTest from './2_taskListTitleTest';
 import { useEffect } from 'react';
 import { di } from 'node_modules/@fullcalendar/core/internal-common';
 import { useAuth } from '../../auth/authContext';
+import { current } from '@reduxjs/toolkit';
+import { Root } from 'postcss';
 
 
 
 const TaskListTest = () => {
     //Store data
-    
-    const allTasks = useSelector((state:RootState) => state.tasks.allTasks);
-    const tasks = useSelector((state: RootState) => state.tasks.tasks);
+    const dispatch:AppDispatch = useDispatch();
     const { currentUser } = useAuth();
     
 
-    const dispatch:AppDispatch = useDispatch();
+   
     useEffect(()=>{
-        dispatch(fetchTasks(currentUser));
-    },[currentUser, dispatch])
-    
-    
+        if(currentUser){
+            dispatch(fetchTasks(currentUser));
+        }
 
+    },[currentUser, dispatch])
+
+    const allTasks = useSelector((state:RootState) => state.tasks.allTasks);
+    const tasks = useSelector((state: RootState) => state.tasks.tasks || []);
+    const loading = useSelector((state: RootState) => state.tasks.loading);
+   
+    console.log('有跑這裡嗎？！！！！！！',tasks)
+    
     const handleUpdateTask = (taskRefString:string, updatedData:Partial<Task>, taskId:string) => {
         dispatch(updateTasksAsync({taskRefString, updatedData, taskId}));
     } 
@@ -36,7 +43,9 @@ const TaskListTest = () => {
         dispatch(deleteTasksAsync({taskRefString, taskId}));
     }
 
-    
+    if(loading){
+        return <div> Loading tasks...</div>
+    }
     return(
         
         <div>

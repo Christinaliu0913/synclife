@@ -43,7 +43,7 @@ const SignIn = () =>{
                 ) 
                 : 
                 (<button className='hp-signup-button' onClick={signWithGoogle}>
-                    <Image className='hp-signup-img'src='/images/google.png' alt="SignIn" width={20} height={20}/>Continue with Google
+                    <Image className='hp-signup-img'src='/images/google.png' alt="SignIn" width={20} height={20}/>Start with Google
                 </button>)
             } 
             {currentUser ? (

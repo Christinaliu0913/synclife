@@ -1,39 +1,41 @@
-import TaskBlock from "./3_taskBlock";
+import TaskBlockTest from "./3_taskBlockTest";
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, doc,updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../../../../firebase';
-import AddTask from "./3_addTask";
+import { db } from '../../../../../firebase';
 import Image from 'next/image';
-import { Task } from "@/types/types";
+import { Task, Category } from "@/types/types";
+import { useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { useDispatch } from 'react-redux';
+import { deleteTasksAsync, fetchProjectTasks, fetchTasks, updateTasksAsync } from "@/features/tasksSlice";
+import AddTaskTest from "./3_addTaskTest";
+import { deleteCategories, updateCategories } from "@/features/categoriesSlice";
 
-interface Category {
-    id: string;
-    projectId: string;
-    categoryTitle: string;
-}
 
 
 
 interface CategoryContentProps {
     key: string;
     category: Category;
-    OnDelete: () => void;
-    OnUpdate: (categoryId: string, updatedData: Partial<Category>) => void;
     members: string[]|[];
     updatedMembers: (assignedMembers: string[], notAssignedMembers: string[]) => void;
 }
 
-const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpdate,members,updatedMembers}) => {
+const CategoryContentTest:React.FC<CategoryContentProps> = ({category,members,updatedMembers}) => {
+    //Store data
+    const dispatch:AppDispatch = useDispatch();
+    const allTasks = useSelector((state:RootState) => state.tasks.allTasks);
+    // data of cate
+    const projectId = category.projectId
+    const categoryId = category.id
     const [title, setTitle] = useState(category.categoryTitle)
     //task
     const [tasks, setTasks] = useState<Task[]>([]);
-    const projectId = category.projectId;
     //Visibal
     const [isCatDeleteVisible, setIsCatDeleteVisible] = useState(false);
-
-    
     //fetch task
     useEffect(()=>{
+    
         const fetchTasks = async () => {
             try{
                 const q = query(collection(db, `project/${projectId}/category/${category.id}/task`));
@@ -53,36 +55,30 @@ const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpd
             }
         }
         fetchTasks();
-    },[projectId, category.id])
+       
+   
+    }, [allTasks, projectId, categoryId,dispatch]);
 
-    //-----編輯Category----
+
+
+    //-------------------------------Category------------------------------------------
+
+    //編輯Category title
     const handleTitleBlur = () =>{
-        OnUpdate(category.id, {categoryTitle: title})
+        const updatedData = {categoryTitle: title}
+        const categoryDef = doc(db, `project/${projectId}/category/${categoryId}`);
+        dispatch(updateCategories({categoryDef, updatedData, categoryId}))
     }
-    //-----Task---------
-    //刪除Task
-    const handleDeleteTask = async(taskId:string) =>{
-        try{
-            const taskDef = doc(db, `project/${projectId}/category/${category.id}/task/${taskId}`)
-            await deleteDoc(taskDef);
-            setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-        }catch(error){
-            console.log('刪除Task時出錯',error)
-        }
+   
+    //刪除Category
+    const handleDeleteCategory = async() => {
+        const categoryDef = doc(db, `project/${projectId}/category/${categoryId}`);     
+        dispatch(deleteCategories({categoryDef, categoryId}));
     }
 
-    const handleUpdateTask = async(taskId:string, updatedData: any) => {
-        try{
-            const taskDef = doc(db, `project/${projectId}/category/${category.id}/task/${taskId}`);
-            await updateDoc(taskDef, updatedData);
-            console.log('更新task',updatedData);
-            setTasks(prevTasks => prevTasks.map(task=> 
-                task.id === taskId? {...task, ...updatedData} : task
-            ))
-        }catch(error){
-            console.log('updateTask mistake',error)
-        }
-    }
+   
+
+   
 
 
     return (
@@ -99,7 +95,7 @@ const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpd
                     ⋮
                     {isCatDeleteVisible?
                     (<>
-                        <div className="category-delete-block" onClick={OnDelete}>
+                        <div className="category-delete-block" onClick={handleDeleteCategory}>
                             <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
                         </div>
                         <div className="categoryt-overlay"></div>
@@ -110,7 +106,7 @@ const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpd
             </div>
 
             <div className="category-addTask">
-                <AddTask
+                <AddTaskTest
                     categoryId={category.id}
                     setTasks={setTasks}
                     tasks={tasks}
@@ -120,12 +116,9 @@ const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpd
             
             
             {tasks?.map(task => (
-                <TaskBlock
+                <TaskBlockTest
                     key={task.id}
                     task={task}
-                    categoryId={category.id}
-                    OnDelete={handleDeleteTask}
-                    OnUpdate={handleUpdateTask}
                     members={members}
                     updatedMembers={updatedMembers}
                 />
@@ -138,4 +131,4 @@ const CategoryContent:React.FC<CategoryContentProps> = ({category,OnDelete,OnUpd
 
 }
 
-export default CategoryContent;
+export default CategoryContentTest;

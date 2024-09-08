@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { AppDispatch } from '@/store'
 import { setFilteredProject } from "@/features/tasksSlice"
+import { useEffect } from "react";
 
 
 
@@ -10,13 +11,17 @@ import { setFilteredProject } from "@/features/tasksSlice"
 const TaskProjectFilterTest = () =>{
     const dispatch:AppDispatch = useDispatch();
     
-    const projects = useSelector((state: RootState) => state.tasks.projects);
+    const projects = useSelector((state: RootState) => state.projects.projects)|| [];
     const selectedProject = useSelector((state: RootState) => state.tasks.selectedProject);
 
     const handleSelectProjectFilter = (e:React.ChangeEvent<HTMLSelectElement>) => {
         const selectedProjectId = e.target.value;
         dispatch(setFilteredProject(selectedProjectId));
     }
+
+    // useEffect(()=>{
+        
+    // },[dispatch])
 
     return (
         <>
@@ -33,12 +38,18 @@ const TaskProjectFilterTest = () =>{
                             <option value="">All</option>
 
                             {/* 選單內容 */}
-                            {projects?.map(project => (
-                                <option key={project.id} value={project.id} >
-                                    {project.projectTitle}
-                                </option>
-
-                            ))}
+                            {projects.length > 0 ? (
+                                projects.map(project => (
+                                    <option key={project.id} value={project.id} >
+                                        {project.projectTitle}
+                                    </option>
+    
+                                ))
+                            ):
+                                (
+                                    <option value="">No projects available</option>
+                                )
+                            }
                     </select>
             </div>
     </>

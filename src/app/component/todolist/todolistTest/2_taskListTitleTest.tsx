@@ -1,5 +1,6 @@
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { useEffect, useState } from "react";
+
+import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { useState } from "react";
 import { db } from '../../../../../firebase'
 import { useAuth } from "../../auth/authContext"; 
 import { Task } from "@/types/types";

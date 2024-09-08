@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, isFulfilled, PayloadAction } from "@reduxjs/toolkit";
 import { db } from '../../firebase'
-import { collection, getDocs, query, where, deleteDoc, doc, updateDoc, setDoc, DocumentReference, DocumentData } from "firebase/firestore";
+import { collection, getDocs, query, where, deleteDoc, doc, updateDoc, setDoc, DocumentReference, DocumentData, getDoc } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { Task, Project } from "@/types/types";
 import { tasks } from "googleapis/build/src/apis/tasks";
@@ -9,17 +9,20 @@ import { create } from "domain";
 
 //設定接口
 interface TasksState{
-    tasks: Task[];
-    projects: Project[];
     allTasks: Task[];
+    tasks: Task[],
+    projectTasks: Task[],
+    projects: Project[];
     selectedProject: string;
     loading: boolean
 }
 
+
 const initialState: TasksState = {
-    tasks: [],
-    projects: [],
     allTasks:[],
+    tasks: [],
+    projectTasks: [],
+    projects: [],
     selectedProject: '',
     loading: false,
 }
@@ -52,6 +55,7 @@ export const removeTaskFromProject = createAsyncThunk('project/removeTaskFromPro
                 await setDoc(noProjectRef, {
                     ...taskData,
                     id: noProjectRef.id,
+                    categoryId:'',
                     projectId: '',
                     projectTitle: ''
                 });
@@ -95,6 +99,7 @@ export const moveTaskToNewProject = createAsyncThunk('project/moveTaskToNewProje
                         await setDoc(newDocRefTask, {
                             ...taskData,
                             id: newDocRefTask.id,
+                            categoryId:currentCatId,
                             projectId: newProjectId,
                             projectTitle: newProjectTitle
                         });
@@ -114,6 +119,7 @@ export const moveTaskToNewProject = createAsyncThunk('project/moveTaskToNewProje
                         await setDoc(newDocRefTask, {
                             ...taskData,
                             id: newDocRefTask.id,
+                            categoryId:currentCatId,
                             projectId: newProjectId,
                             projectTitle: newProjectTitle
                         });
@@ -155,6 +161,7 @@ export const updateTaskProject = createAsyncThunk('project/updateTaskProject',
                     await setDoc(newDocRefTask, {
                         ...taskData,
                         id: newDocRefTask.id,
+                        categoryId:currentCatId,
                         projectId: newProjectId,
                         projectTitle: newProjectTitle
                     });
@@ -176,6 +183,7 @@ export const updateTaskProject = createAsyncThunk('project/updateTaskProject',
                         await setDoc(newDocRefTask, {
                             ...taskData,
                             id: newDocRefTask.id,
+                            categoryId:currentCatId,
                             projectId: newProjectId,
                             projectTitle: newProjectTitle
                         });
@@ -192,7 +200,22 @@ export const updateTaskProject = createAsyncThunk('project/updateTaskProject',
     }
 )
 
-
+//Project的Tasks
+export const fetchProjectTasks = createAsyncThunk('tasks/fetchProjectTasks',
+    async({projectId, categoryId}:{projectId:string,categoryId:string}) => {
+        try{
+            const q = query(collection(db, `project/${projectId}/category/${categoryId}/task`));
+            const querySnapshot = await getDocs(q);
+            const fetchedTasks: Task[] = querySnapshot.docs.map(doc =>({
+                ...doc.data() as Task,
+                id: doc.id
+            }));
+            return fetchedTasks;
+        }catch(error){
+            console.log('這個category沒有task');
+        }
+    }
+)
 
 //-----------Tasks---------------------------
 
@@ -245,7 +268,7 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser
 
 })
 
-//Async Upload Tasks 
+//Async update Tasks 
 export const updateTasksAsync = createAsyncThunk('tasks/updateTask', 
     async ({taskRefString, updatedData, taskId} : { taskRefString:string, updatedData:Partial<Task>, taskId:string}) => {
     const taskRef = doc(db, `${taskRefString}`, taskId)
@@ -256,19 +279,42 @@ export const updateTasksAsync = createAsyncThunk('tasks/updateTask',
 //Async Delete Tasks 
 export const deleteTasksAsync = createAsyncThunk('tasks/deleteTask', 
     async({taskRefString, taskId}:{ taskRefString: string, taskId:string}) => {
-    const taskRef = doc(db, taskRefString);
-    await deleteDoc(taskRef);
-    return taskId
-})
+        try{
+            const taskRef = doc(db, taskRefString);
+            await deleteDoc(taskRef);
+            return taskId
+        }catch(error){
+            console.log('deleteTask mistake',error)
+        }
+        
+    }
+)
 
 // Async Add Tasks 
 export const addTasksAsync = createAsyncThunk('tasks/addTask', 
-    async({newDocRef, newTask, selectedProject, currentUser}:{ newDocRef:DocumentReference<DocumentData> , newTask:Task, selectedProject:string, currentUser: User})=>{
-    await setDoc(newDocRef, newTask);
+    async({newDocRef, newTask}:{ newDocRef:DocumentReference<DocumentData> , newTask:Task})=>{
+        try{
+            await setDoc(newDocRef, newTask);
+        }catch(error){
+            console.log('新增Task時出錯')
+        }
+        console.log('成功新增TASK',newTask)
     return newTask;
 })
 
-
+export const setTaskUpdate = createAsyncThunk('task/setTaskUpdate',
+    async({taskRefString, taskId}: {taskRefString:string,taskId:string}) => {
+        const taskQuery = doc(db, `${taskRefString}/${taskId}`);
+        const taskSnapshot = await getDoc(taskQuery);
+        // const tasks = taskSnapshot
+        if(taskSnapshot.exists()){
+            const updatedTask = taskSnapshot.data();
+            return updatedTask
+        }else{
+            throw new Error ('Task not found')
+        }
+    }
+)
 
 //定義slice邏輯來管理tasks狀態
 const tasksSlice = createSlice({
@@ -320,8 +366,8 @@ const tasksSlice = createSlice({
             })
             //add tasks
             .addCase(addTasksAsync.fulfilled, (state, action) => {
-                state.allTasks.push(action.payload);
-                state.tasks.push(action.payload);
+                state.allTasks.unshift(action.payload);
+                state.tasks.unshift(action.payload);
             })
             // 取消原本有project的task
             .addCase(removeTaskFromProject.fulfilled,(state, action)=> {
@@ -356,7 +402,20 @@ const tasksSlice = createSlice({
                     task.id === taskId ? { ... task, projectId: newProjectId, newProjectTitle: newProjectTitle} : task
                 )
             })
-            
+            // ProjectTasks
+            .addCase(fetchProjectTasks.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchProjectTasks.fulfilled, (state, action) => {
+                state.projectTasks = action.payload as Task[];
+                state.loading = false;
+            })
+            // Updated task after assigned 
+            .addCase(setTaskUpdate.fulfilled, (state ,action) => {
+                const updatedTask = action.payload as Task;
+                state.allTasks.push(updatedTask);
+                state.tasks.push(updatedTask);
+            })
             
     }
 });

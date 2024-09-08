@@ -16,7 +16,7 @@ interface TaskListDateProps{
 
 const TaskListDateTest:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
     const {currentUser} = useAuth();
-    const [date, setDate] = useState(task.taskDate);
+    const [date, setDate] = useState(task.taskDate.slice(0,10));
     const projectId = task.projectId
     const [isDeleteVisible, setDeleteVisible] = useState(false);
 
@@ -101,7 +101,7 @@ const TaskListDateTest:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) 
                     <div className="tasklist-delete-block" onClick={handleDeleteTask}>
                         <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
                     </div>
-                    {/* <div className="tasklist-overlay"></div> */}
+                    <div className="tasklist-overlay"></div>
                 </>
                 
             )
