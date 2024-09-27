@@ -1,10 +1,13 @@
 import { auth, db } from '../../../../firebase';
 import { collection, doc, setDoc} from 'firebase/firestore';
 import { useAuth } from '../auth/authContext';
-import Image from 'next/image';
 import { Dispatch, SetStateAction } from 'react';
+import { useDispatch } from 'react-redux';
 import { Task } from '@/types/types';
-
+import { addTasksAsync } from '@/features/tasksSlice';
+import { AppDispatch } from '@/store'
+import { useSelector } from "react-redux";
+import { RootState } from '@/store';
 
 interface AddTaskProps {
     categoryId: string;
@@ -15,6 +18,9 @@ interface AddTaskProps {
 
 
 const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) => {
+    //store data
+    const dispatch:AppDispatch = useDispatch();
+
     const {currentUser,loadingUser} = useAuth();
     const taskTitle = '';
     const taskStatus = 'Unstarted';
@@ -26,7 +32,6 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
     const calendarId = '';
     
     
-
     //新增一個Task
     const handleAddTask = async() => {
         if(!loadingUser){
@@ -47,10 +52,8 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
                         projectTitle:'',
                         projectId: projectId
                 }
-                await setDoc(newDocRef, newTask)
-                console.log('已新增一個task了', newDocRef.id,`project/${projectId}/category/${categoryId}/task`)
-
-                setTasks(tasks => (tasks ? [newTask,...tasks] : [newTask]));
+                dispatch(addTasksAsync({newDocRef, newTask}))
+                console.log('addNewTask!!!!!!!!!!!!!!',newTask)
             }
             console.log('no currentUser')
         }

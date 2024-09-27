@@ -8,21 +8,27 @@ import { collection , getDocs, query, where } from "firebase/firestore";
 import { db } from '../../../../../firebase';
 
 
-export const useFetchGoogleEvents = (token: string | undefined, projects: Project[]) => {
+export const useFetchGoogleEvents = (token: string | undefined, projects: Project[],dispatch:any) => {
 
-  const dispatch = useDispatch();
+
   
   useEffect(() => {
     if (!token) {
       console.error('Google token is undefined.');
       return;
     }
-
+    //確認project已經載入
+    
     const fetchEvents = async () => {
       if (typeof window === 'undefined') {
         console.error('Cannot fetch Google events on the server.');
         return;
       }
+      if (projects === undefined || !Array.isArray(projects)) {
+        dispatch(setLoading(true));
+        return;
+      }
+
       
       dispatch(setLoading(true));
 

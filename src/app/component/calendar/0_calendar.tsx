@@ -27,7 +27,7 @@ const Calendar = dynamic(() => import("@fullcalendar/react"), {
     ssr: false,
   });
 
-const CalendarComponentTest = () =>{
+const CalendarComponent = () =>{
     
     //目前使用者資料
     const { currentUser } = useAuth();
@@ -58,13 +58,15 @@ const CalendarComponentTest = () =>{
     const projects = useSelector((state:RootState) => state.projects.projects)
   
     //載入時確認token跟events來設置events
-    useFetchGoogleEvents(token, projects);
     useEffect(() => {
         
         dispatch(fetchLocalEvents(currentUser));
         
     }, [currentUser, allTasks]);
-
+    //載入google events
+    
+        useFetchGoogleEvents(token, projects, dispatch);
+   
     // useEffect(() => {
     //     if(token){
     //         dispatch(fetchGoogleEvents(token));
@@ -402,6 +404,6 @@ const CalendarComponentTest = () =>{
     )
 }
 
-export default CalendarComponentTest;
+export default CalendarComponent;
 
                     

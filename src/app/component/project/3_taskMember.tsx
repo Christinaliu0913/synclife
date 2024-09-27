@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { query, collection, getDocs, getDoc,doc ,updateDoc} from "firebase/firestore"
-import { db } from "../../../../../firebase";
+import { db } from "../../../../firebase";
 import Image from "next/image";
 import { Task } from "@/types/types";
 import { useSelector } from 'react-redux';

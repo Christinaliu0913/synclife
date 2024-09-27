@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import GoogleCalendarAuth from "../component/auth/googleCalendarAuth";
 import "./pages.scss";
+
 const CalendarComponent = dynamic(() => import("../component/calendar/0_calendar"), {
   ssr: false,
 });

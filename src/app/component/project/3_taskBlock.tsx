@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import AssignMember from './member/taskAssign_Member';
 import Image from 'next/image';
-
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    createdAt: string;  
-}
+import { Task } from '@/types/types';
+import { deleteTasksAsync, updateTasksAsync } from '@/features/tasksSlice';
+import { AppDispatch, RootState } from '@/store';
+import { useDispatch } from 'react-redux';
 
 const getStatusColor = (status: string): string => {
     switch(status){
@@ -31,15 +21,18 @@ const getStatusColor = (status: string): string => {
 
 interface TaskBlockProps {
     task: Task;
-    OnDelete: (taskId: string) => void;
-    OnUpdate: (taskId: string, updatedTask: Partial<Task>) => void;
-    categoryId: string|null;
     members: string[]|[];
     updatedMembers: (assignedMembers: string[], notAssignedMembers: string[]) => void;
 }
 
 
-const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,members,updatedMembers}) => {
+const TaskBlock:React.FC<TaskBlockProps> = ({task,members,updatedMembers}) => {
+    //Store data
+    const dispatch:AppDispatch = useDispatch();
+
+    const projectId = task.projectId;
+    const categoryId = task.categoryId;
+    const taskId = task.id
     const [title, setTitle] = useState(task.taskTitle);
     const [status, setStatus] = useState(task.taskStatus);
     const [assign, setAssign] = useState(task.taskAssign);
@@ -53,35 +46,33 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
     const [isFocus, setIsFocus] = useState(false);
     //visible
     const [isTaskDeleteVisible, setIsTaskDeleteVisible] = useState(false)
+
     //調整textarea高度
     useEffect(()=>{
         adjustNoteHeight();
     },[description])
 
-    //-------------編輯Task的內容----------
-    const handleTitleBlur = () =>{
-        OnUpdate(task.id, {taskTitle: title})
-    }
-
-    const handleStatus = () =>{
-        OnUpdate(task.id, {taskStatus: status})
-    }
 
     //轉換狀態顏色
     const handleTaskStatusColor = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
         setStatus(value)
         setTaskStatusColor(getStatusColor(value))
-
     }
 
-    const handleDate = () =>{
-        OnUpdate(task.id, {taskDate: date})
-    }
+    //Update Task
+    const handleUpdateTask = async(updatedData: any) => {
+        const taskRefString = `project/${projectId}/category/${categoryId}/task/`;
+        dispatch(updateTasksAsync({taskRefString,updatedData,taskId}));
+    };
 
-    const handleDescription = () =>{
-        OnUpdate(task.id, {taskDescription: description})
+    //Delete Task
+    const handleDeleteTask =  () => {
+        const taskRefString = `project/${projectId}/category/${categoryId}/task/${taskId}`;
+        dispatch(deleteTasksAsync({taskRefString, taskId}));
     }
+     //-------------------------------Task-------------------------------------
+
     //調整Note的大小
     const adjustNoteHeight = () => {
         if(textAreaRef.current){
@@ -101,12 +92,16 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
         <div className="taskBlock">
 
             <div className='taskTitle'>
-                <input type="text" placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} onBlur={handleTitleBlur}/>
+                <input type="text" placeholder="Title" 
+                    value={title} 
+                    onChange={(e)=>setTitle(e.target.value)} 
+                    onBlur = {(e)=>{handleUpdateTask({taskTitle: e.target.value})}}
+                />
                 <button onClick={()=>{setIsTaskDeleteVisible(prev=> !prev)}}>
                     ⋮
                     {isTaskDeleteVisible?
                     (<>
-                        <div className="category-delete-block" onClick={()=>OnDelete(task.id)}>
+                        <div className="category-delete-block" onClick={handleDeleteTask}>
                             <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
                         </div>
                         <div className="categoryt-overlay"></div>
@@ -118,7 +113,11 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
             
             <div className='taskStatus'>
                 <label className='taskStatus-color' htmlFor="status" style={{backgroundColor:taskStatusColor}}></label>
-                <select className="taskStatus-select" name="" id="" value={status} onChange={handleTaskStatusColor} onBlur={handleStatus}>
+                <select className="taskStatus-select" name="" id="" 
+                    value={status} 
+                    onChange={handleTaskStatusColor} 
+                    onBlur = {(e)=>{handleUpdateTask({taskStatus: e.target.value})}}
+                    >
                     <option value="Unstarted">  Unstarted</option>
                     <option value="Processing">  Processing</option>
                     <option value="Done">  Done</option>
@@ -133,7 +132,7 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
                     type="date" 
                     value={date}
                     onChange = {(e) => setDate(e.target.value)}
-                    onBlur = {handleDate}
+                    onBlur = {(e)=>{handleUpdateTask({taskDate: e.target.value})}}
                 
                 />
             </div>
@@ -162,7 +161,7 @@ const TaskBlock:React.FC<TaskBlockProps> = ({task,OnDelete,OnUpdate,categoryId,m
                      }}
                     onBlur = {(e)=>{
                         setIsFocus(false);
-                        OnUpdate(task.id, {taskDescription: e.target.value});
+                        handleUpdateTask({taskDescription: e.target.value});
                         adjustNoteHeightClose();
                     }}
                     onFocus={()=>{
