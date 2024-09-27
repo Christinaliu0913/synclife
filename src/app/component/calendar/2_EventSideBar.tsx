@@ -337,13 +337,21 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                             onClick={()=> setShowNewProject(!showNewProject)}
                             >
                         <option value="0">None</option>
-                        {projects?.map(project => (
-                            <ProjectOption
-                                key={project.id}
-                                project={project}
-                            />   
-                        )
-                        )}
+                        {projects? 
+                            (projects?.map(project => (
+                                <ProjectOption
+                                    key={project.id}
+                                    project={project}
+                                />   )
+                            ))
+                            :
+                            (
+                                <>
+                                <option >no projects</option>
+                                </>
+                            )
+                        
+                        }
 
                         
                         
