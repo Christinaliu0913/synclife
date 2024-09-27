@@ -38,3 +38,35 @@ export interface Project {
     projectOwner: string | undefined;
     createdAt: string;
 }
+
+export interface Event {
+    title: string;
+    id: string|null;
+    start: string;
+    end: string;
+    checkAllDay: boolean;
+    calendar: string;
+    description: string;
+    newProject: string|null;
+}
+
+export interface EventTask {
+    id: string;
+    taskTitle: string;
+    taskStatus: string;
+    taskAssign: string[]|[];
+    taskNotAssign: string[]|[];
+    taskDate: string;
+    taskDescription: string;
+    taskOwner: string | null;
+    calendarId: string;
+    categoryId: string;
+    projectId: string;
+    projectTitle: string;
+    createdAt: string;  
+    allDay: boolean;
+    backgroundColor: string;
+    taskType: string;
+    calendarType: string;
+    completed: boolean;
+}

@@ -1,39 +1,29 @@
 "use client"
 import {use, useEffect, useRef, useState} from 'react';
 import addEventToGoogleCalendar from './2_addNewEvent';
-import { gapi } from 'gapi-script';
-import readEvent from './3_readEvent';
 import ProjectOption from './4_projectOption';
 import { collection, query, where, getDocs, doc,updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../../../firebase';
 import { useAuth } from '../auth/authContext';
 import AddorEditProjectTask from './3_addprojectTask';
 import Image from 'next/image';
+import { Project, Event } from '@/types/types';
 import Cookies from 'js-cookie';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { AppDispatch } from '@/store'
+import { fetchProjects } from '@/features/projectsSlice';
 
-interface Project {
-    id: string;
-    uid: string;
-    projectTitle: string;
-    projectStatus: string;
-    projectMember: string[];
-    projectDateStart: string;
-    projectDateEnd: string;
-    projectOwner: string | undefined;
-    createdAt: string;
-}
 
 interface EventSideBarProps{
     show: boolean;
-    createNewProject: (project:string)=> void 
-    setEvents: React.Dispatch<React.SetStateAction<any[]>>;
-    events: any[]|null;//當前事件的列表
-    tasks:any;
+    //token:string |undefined;
     allDay:boolean;
     calendars: any[]|null;
     //selectedDate: string | null;
     selectedEvent: any|null;
     selectedEventId: string;
+    selectedEventType: string;
     selectedStartTime: string | null;
     selectedEndTime: string | null;
     selectedCalendar: string |null;
@@ -44,32 +34,16 @@ interface EventSideBarProps{
     Ondelete:(addedEvent:any)=> void;
 }
 
-interface EventData {
-    title: string;
-    id: string|null;
-    start: string;
-    end: string;
-    checkAllDay: boolean;
-    calendar: string;
-    description: string;
-    newProject: string|null;
-}
-
-
-
-
 
 
 const EventSideBar:React.FC<EventSideBarProps> = ({
     show, 
-    createNewProject,
-    setEvents,
-    events,
-    tasks,
+    //token,
     allDay,
     calendars,
     selectedEvent,
     selectedEventId,
+    selectedEventType,
     selectedStartTime,
     selectedEndTime,
     selectedCalendar,
@@ -79,9 +53,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     setsideBarVisible,
     Ondelete
     }) => {
-    //要新增使用者目前滑鼠所點到的位置
 
-    const [clientPosition, setClientPosition] = useState({x:0, y:0});
     //所選到的event資料
     const [calendarId, setCalendarId] = useState('')
     const [title, setTitle] = useState('');
@@ -99,16 +71,38 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     const [newProject, setNewProject] = useState<string|null>('');
     const [projectId, setProjectId] = useState('');
     const [optionProject, setOptionProject] = useState('');
+    const [optionProjectTitle, setOptionProjectTitle] = useState('');
     //目前使用者資料
     const { currentUser,loadingUser } = useAuth();
     //googleCalendar List
     const [googleCalendars, setGoogleCalendars] = useState<any[]|null>([])
     //Project資料
-    const [projects, setProjects] = useState<Project[]>([]);
+
+    //type
+    const [eventType, setEventType] = useState(''); 
 
     //visible
     const [isEventDeleteVisible, setIsEventDeleteVisible] = useState(false)
+    const [showProjectSelect, setShowProjectSelect] = useState(false)
+    const [showNewProject, setShowNewProject] = useState(false)
+    const [showCreateNewProject, setShowCreateNewProject] = useState(false)
     console.log('確認selected日曆',selectedEvent)
+    
+    //----------------store data目前使用者的project---------------------
+    const dispatch:AppDispatch = useDispatch();
+    // task
+    const allTasks = useSelector((state:RootState) => state.tasks.allTasks);
+    const taskLoading = useSelector((state: RootState) => state.tasks.loading);
+    // project
+    const projects = useSelector((state: RootState) => state.projects.projects);
+    const projectLoading = useSelector((state: RootState) => state.projects.loading);
+    // event
+    const events = useSelector((state:RootState) => state.events.events)
+  
+    useEffect(() => {
+        dispatch(fetchProjects(currentUser));
+    }, [dispatch,allTasks]);
+
 
     //處理選到evnet的資訊
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,6 +122,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             setProjectId(selectedProjectId||'');
             setOptionProject(selectedProjectId || '');
             setGoogleCalendars(calendars||[]);
+            setEventType(selectedEvent.taskType)
         //如果沒有的話設定選到的時間
         }else if(selectedStartTime){
             let endDateTime = selectedEndTime ? selectedEndTime : selectedStartTime;
@@ -146,37 +141,13 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             }
         
         }
-        console.log('project;alksdjf', project)
+
     },[selectedEvent,selectedStartTime,selectedEndTime,allDay])
 
-    //先fetc h這個人的project
-    useEffect(()=>{
-        const fetchProjects = async () => {
-            if(!loadingUser && currentUser){
-                try{
-                    const q = query(collection(db, 'project'), where('projectMember','array-contains',currentUser.email));
-                    const querySnapshot = await getDocs(q);
-                    const currentUserProjects = querySnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    } as Project));
-                    if(currentUserProjects){
-                        setProjects(currentUserProjects);
-                        console.log('這個人的project有', currentUserProjects);
-                        
-                    }else{
-                        console.log('這個人沒有project')
-                    }
-                }catch(error){
-                    console.log('獲取項目出錯',error);
-                }
-            }
-        }
-        fetchProjects();
-    },[currentUser,loadingUser])
-    
+
+    //新增到google calendar上
     const handleSave = async() => {
-        const newEventData : any ={
+        const newEventData : Event ={
             title : title || '', 
             start, 
             end, 
@@ -194,19 +165,12 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             const googleToken = Cookies.get('googleToken');
             if(googleToken){
                 await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
-                
                 //將資料傳給google
                 const addedEvent = await addEventToGoogleCalendar(newEventData);
 
-                if(addedEvent){
-                    const renewEvents = await readEvent(currentUser,tasks);
-                    if(renewEvents){
-                        setEvents(renewEvents);
-                    }else{
-                        console.log('新增或編輯新實踐時更新資料錯誤')
-                    }
-                    //！！！！！！！！要修改這曆有關要怎麼把project也跟新進去！！！
-                }
+                // if(addedEvent){
+                //     dispatch(fetchGoogleEvents(token))
+                // }
             }else{
                 console.log('without google calendar auth, save in local');
                 const newEventRef = doc(collection(db, `event/${currentUser?.uid}/event`))
@@ -217,32 +181,13 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     checkAllDay: checkAllDay,
                     description: description || '',
                     taskStatus: 'Unstarted',
-                    projectTitle: newProject || '',
-                    projectId: projectId || '',
+                    projectTitle: '',
+                    projectId: newProject || '',
                     createdAt: new Date().toISOString()
                 })
-
-                const newTask = {
-                    id: newEventRef.id,
-                    title: title || '',
-                    start: start,
-                    end: end,
-                    allDay: checkAllDay,
-                    description: description || '',
-                    taskStatus: 'Unstarted',
-                    projectTitle: newProject || '',
-                    projectId: projectId || '',
-                    calendarType: 'local'
-                };
-
-                setEvents(prevEvents => [...prevEvents, newTask]);
             }
 
 
-            
-            
-            
-            
 
             //儲存資料後關閉視窗
             onClose();
@@ -252,51 +197,6 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
         }
 
     };
-
-    //新增到google calendar上
-    // const handleSave = async() => {
-    //     const newEventData : EventData ={
-    //         title : title || '', 
-    //         start, 
-    //         end, 
-    //         checkAllDay, 
-    //         calendar: calendar || 'default', 
-    //         description, 
-    //         newProject, 
-    //         id: selectedEventId? selectedEventId : null
-    //     };
-    //     const endTimeSet = end.slice(0,10);
-    //     console.log('newEventData',newEventData);
-        
-
-    //     try{
-    //         console.log('cat創立',project)
-
-    //         await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
-    //         //將資料傳給google
-    //         const addedEvent = await addEventToGoogleCalendar(newEventData);
-            
-    //         if(addedEvent){
-    //             const renewEvents = await readEvent(currentUser,tasks);
-    //             if(renewEvents){
-    //                 setEvents(renewEvents);
-    //             }else{
-    //                 console.log('新增或編輯新實踐時更新資料錯誤')
-    //             }
-
-    //             //！！！！！！！！要修改這曆有關要怎麼把project也跟新進去！！！
-                
-    //         }
-            
-
-    //         //儲存資料後關閉視窗
-    //         onClose();
-
-    //     }catch(error){
-    //         console.log('新增日曆時出錯',error);
-    //     }
-
-    // };
 
    const handleAllDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCheckAllDay(e.target.checked);
@@ -308,12 +208,16 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
    }
 
      //關閉sidebar
-     const onClose = () => {
+    const onClose = () => {
         setsideBarVisible(false)
         //清除表單資料
         clearSideBar();
       } 
-      //清理sidebar的東西
+    const onCloseProjectCreate = () => {
+        setShowCreateNewProject(false)
+
+    }
+    //清理sidebar的東西
     const clearSideBar = () => {
     setTitle('');
     setStart('');
@@ -323,9 +227,27 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     setProject('');
     setProjectId('');
     setOptionCalendar('');
+    setNewProject('');
+    setOptionProject('');
     }
    
+    //adding or change project
+    const handleOptionClick = (project: Project | null) => {
+        if(project !==null){
+            setNewProject(project.id);
+            setOptionProject(project.id);
+            setOptionProjectTitle(project.projectTitle);
+        }
+        else{
+            setOptionProject('');
+            setNewProject(null);
+        }
+    }
+    //Adding New project
+    const handleAddNewProject = () => {
+        setShowCreateNewProject(!showCreateNewProject)
 
+    }
     return (
         <>
         {/* 點擊才會show */}
@@ -390,9 +312,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     </select>
                 </div> */}
                     
-                <div className='sidebar-note' >
-                    <input placeholder='Note' type="text" name="" id="description" value={description} onChange={(e)=> setDescription(e.target.value) }/>
-                </div>
+                
 
                 <div className='sidebar-project'>
                     
@@ -413,20 +333,80 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                                 }
                                 console.log('changeck',optionProject)
                                 console.log('finalck',optionProject)
-                            }} >
+                            }}
+                            onClick={()=> setShowNewProject(!showNewProject)}
+                            >
                         <option value="0">None</option>
                         {projects?.map(project => (
-                        <ProjectOption
-                            key={project.id}
-                            project={project}
-                        />   
+                            <ProjectOption
+                                key={project.id}
+                                project={project}
+                            />   
                         )
                         )}
 
                         
-                        <button>add new project</button>
+                        
                     </select>
+                  
+                    
+                    
                 </div>
+                <div className='sidebar-project'>
+                    
+                    <Image className='sidebar-projectImg' src="/images/Folder_light.svg" alt="task project" width={25} height={25}/>
+                    <label htmlFor="project">Project</label>
+                    <div className='sidebar-project-select' onClick={()=> setShowProjectSelect(!showProjectSelect)}>
+                        {optionProjectTitle? optionProjectTitle : 'Add in project' }
+                        <Image className='sidebar-project-select-toggle' src="/images/toggle.svg" alt="task project" width={15} height={15}/>
+                        {showProjectSelect && 
+                            (
+                                <>
+                                    {/* <div className='sidebar-overlay'></div> */}
+                                    <div className='sidebar-project-selectItems'>
+                                        <button onClick={()=> handleAddNewProject()}><Image src="/images/add.svg" alt="task project" width={15} height={15}/>Add new project</button>
+                                        <div  className="sidebar-project-selectItem" onClick={() => handleOptionClick(null)}> no project </div>
+                                        {projects?.map(project => (
+                                            <div key={project.id} className="sidebar-project-selectItem" onClick={() => handleOptionClick(project) } ><p>{project.projectTitle}</p></div> 
+                                        )
+                                        )}
+                                        
+                                    </div>   
+                                    
+                                </>
+                            )
+                        }
+                    
+                    </div>
+                    
+                    {showCreateNewProject &&
+                        (
+                            <>
+                                <div className='sidebar-project-createProject'>
+                                    <div className='sidebar-project-createProject-box'>
+                                        <div>
+                                            Create new project
+                                        </div>
+                                        <input type="text" name="" id="" placeholder='Project name'/>
+                                        <div className='createProject-create'>Create project</div>
+                                        <button onClick={onCloseProjectCreate} className='createProject-close'>x</button>
+                                    </div>
+                                </div>
+                                <div onClick={onCloseProjectCreate} className='sidebar-overlay'>
+
+                                </div>
+                            </>
+                            
+                        )
+                    }
+                    
+                </div>
+
+                <div className='sidebar-note' >
+                    <input placeholder='Note' type="text" name="" id="description" value={description} onChange={(e)=> setDescription(e.target.value) }/>
+                </div>
+
+                
                 {/*  */}
                 <button  className='sidebar-cancel' onClick={onClose}>Cancel</button>
                 <button  className='sidebar-save'onClick={handleSave} >Save</button>
