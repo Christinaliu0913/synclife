@@ -1,23 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../auth/authContext";
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { db } from "../../../../firebase";
+import { db } from '../../../../firebase'
 import Image from "next/image";
+import { Task } from '@/types/types'
 
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    projectTitle: string;
-    createdAt: string;  
-}
+
 
 interface TaskListDateProps{
     task: Task;
@@ -28,7 +16,7 @@ interface TaskListDateProps{
 
 const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
     const {currentUser} = useAuth();
-    const [date, setDate] = useState(task.taskDate);
+    const [date, setDate] = useState(task.taskDate.slice(0,10));
     const projectId = task.projectId
     const [isDeleteVisible, setDeleteVisible] = useState(false);
 
@@ -113,7 +101,7 @@ const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
                     <div className="tasklist-delete-block" onClick={handleDeleteTask}>
                         <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
                     </div>
-                    {/* <div className="tasklist-overlay"></div> */}
+                    <div className="tasklist-overlay"></div>
                 </>
                 
             )

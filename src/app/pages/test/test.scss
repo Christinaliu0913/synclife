@@ -24,6 +24,20 @@ h1{
 .main{
     display: flex;
 }
+
+.loading-task{
+    display: flex;
+    align-items: center;
+    color: $greyLight;
+    font-size:16px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .list{
 margin: 15px;
 min-width: 365px;

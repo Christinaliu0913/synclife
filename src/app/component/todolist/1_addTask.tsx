@@ -1,37 +1,30 @@
 import { useState } from "react"
-import { db } from '../../../../firebase';
+import { db } from '../../../../firebase'
 import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { User } from "firebase/auth";
+import { useDispatch } from 'react-redux';
+import { addTasksAsync } from '@/features/tasksSlice';
+import { AppDispatch } from '@/store'
+import { useSelector } from "react-redux";
+import { RootState } from '@/store';
+import { Task } from "@/types/types";
+import { addProjects } from "@/features/projectsSlice";
+import { addCategories, updateCategories } from "@/features/categoriesSlice";
 
-
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    projectTitle: string;
-    createdAt: string;  
-}
 
 interface TaskProps{
     currentUser: User|null;
     loadingUser: boolean;
-    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-    selectedProject: string;
-    setAllTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
 
-const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedProject,setAllTasks}) => {
+const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
+
+    const dispatch:AppDispatch = useDispatch();
+    const selectedProject = useSelector((state: RootState) => state.tasks.selectedProject);
 
     const [title,setTitle] = useState('')
-    const taskStatus = 'unstarted';
+    const taskStatus = 'Unstarted';
     const taskAssign:string[] = [];
     const taskNotAssign = ['']
     const taskDescription = '';
@@ -40,14 +33,18 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
     const taskOwner: string | null = currentUser?.email ?? null; 
     const calendarId = '';
     const projectId = selectedProject? selectedProject:'';
+   
+    
+    //project setting 
     const projectTitle = '';
+    
+
     const handleAddTask = async() => {
         if(!loadingUser){
             if(currentUser){
                 //如果project==noproject的話
-                if(selectedProject===""){
-                    try{
-                        const newDocRef = doc(collection(db,`noProject/${currentUser.uid}/task`));
+                if(selectedProject === ""){
+                    const newDocRef = doc(collection(db,`noProject/${currentUser.uid}/task`));
                     const newTask:Task = {
                         id: newDocRef.id,
                             taskTitle:title,
@@ -59,17 +56,13 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
                             taskOwner,
                             calendarId,
                             createdAt: new Date().toISOString(),
+                            categoryId:'',
                             projectId,
                             projectTitle
-                    }
-                    await setDoc(newDocRef, newTask)
+                    };
 
-                    setTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
-                    setAllTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
+                    dispatch(addTasksAsync({newDocRef, newTask}));
                     setTitle('');
-                    }catch(error){
-                        console.log('移動到noproject時出錯')
-                    }
                     
                 }
                 //如果project== projectId
@@ -84,11 +77,11 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
 
                     //如果有一個叫做未分類的cat的話，就直接在這個cat新增task 
                     if(currentUserCat.length > 0){
-                        try{
+                        
                             const currentCatId = currentUserCat[0].id;
-                            const newDocRefTask = doc(collection(db, `project/${selectedProject}/category/${currentCatId}/task`));
+                            const newDocRef = doc(collection(db, `project/${selectedProject}/category/${currentCatId}/task`));
                             const newTask:Task = {
-                                id: newDocRefTask.id,
+                                id: newDocRef.id,
                                     taskTitle:title,
                                     taskStatus,
                                     taskAssign:[`${currentUser.email}`],
@@ -98,17 +91,13 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
                                     taskOwner,
                                     calendarId,
                                     createdAt: new Date().toISOString(),
+                                    categoryId:currentCatId,
                                     projectId,
                                     projectTitle
                             }
-                            await setDoc(newDocRefTask, newTask)
-                            setTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
-                            setAllTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
+                            dispatch(addTasksAsync({newDocRef, newTask}));
                             setTitle('');
-                        }catch(error){
-                            console.log("移動錯誤 already have unclassified in cat")
-                        }
-                        
+
                 
                     }else{
                         //如果沒有找到未分類的cat就直接創一個
@@ -121,11 +110,10 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
                                     createAt: new Date().toISOString(),
                                     projectId: selectedProject
                             }
-                            await setDoc(newDocRefCat, newCategory);
                             const currentCatId = newCategory.id;
-                            const newDocRefTask = doc(collection(db, `project/${selectedProject}/category/${currentCatId}/task`));
+                            const newDocRef = doc(collection(db, `project/${selectedProject}/category/${currentCatId}/task`));
                             const newTask:Task = {
-                                id: newDocRefTask.id,
+                                id: newDocRef.id,
                                     taskTitle:title,
                                     taskStatus,
                                     taskAssign:[`${currentUser.email}`],
@@ -135,13 +123,14 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser,setTasks,selectedP
                                     taskOwner,
                                     calendarId,
                                     createdAt: new Date().toISOString(),
+                                    categoryId:currentCatId,
                                     projectId,
                                     projectTitle
                             }
-                            await setDoc(newDocRefTask, newTask)
-                            setTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
-                            setAllTasks((tasks)=> (tasks?[...tasks,newTask]:[newTask]));
+                            dispatch(addTasksAsync({newDocRef, newTask}));
+                            dispatch(addCategories({newDocRefCat,newCategory}));
                             setTitle('');
+                            
                         }catch(error){
                             console
                         }

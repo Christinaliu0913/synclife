@@ -1,55 +1,51 @@
-import { User } from 'firebase/auth';
-import { collection, getDocs, query,where } from 'firebase/firestore';
-import { useState, useEffect } from 'react';
-import { db } from '../../../../firebase';
-import TaskListProject from './2_taskListProject';
-import TaskListTitle from './2_taskListTitle';
-import TaskListDate from './2_taskListDate';
-import { useAuth } from '../auth/authContext';
+
 import { useSelector, useDispatch } from 'react-redux';
-import { updateTasksAsync, deleteTasksAsync } from '@/features/tasksSlice';
+import { updateTasksAsync, deleteTasksAsync, fetchTasks } from '@/features/tasksSlice';
+import { RootState } from '@/store';
+import { AppDispatch } from '@/store'
+import { Task } from "@/types/types";
+import TaskListProject from './2_taskListProject';
+import TaskListDate from './2_taskListDate';
+import TaskListTitle from './2_taskListTitle';
+import { useEffect } from 'react';
+import { di } from 'node_modules/@fullcalendar/core/internal-common';
+import { useAuth } from '../auth/authContext';
+import { current } from '@reduxjs/toolkit';
+import { Root } from 'postcss';
 
-interface Project {
-    id: string;
-    uid: string;
-    projectTitle: string;
-    projectStatus: string;
-    projectMember: string[];
-    projectDateStart: string;
-    projectDateEnd: string;
-    projectOwner: string | undefined;
-    createdAt: string;
-}
 
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    projectTitle: string;
-    createdAt: string;  
-}
 
-interface TaskProps{
-    tasks: Task[];
-    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-    onUpdate: (taskRefString: string, updatedData: Partial<Task>,taskId: string) => void;
-    projects: Project[];
-    onDelete: (taskRefString: string, taskId: string) => void;
-    setAllTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-}
-
-const TaskList:React.FC<TaskProps> = ({tasks,setTasks,onUpdate,projects,onDelete,setAllTasks}) => {
+const TaskList = () => {
+    //Store data
+    const dispatch:AppDispatch = useDispatch();
+    const { currentUser } = useAuth();
     
 
+   
+    useEffect(()=>{
+        if(currentUser){
+            dispatch(fetchTasks(currentUser));
+        }
 
+    },[currentUser, dispatch])
+
+    const allTasks = useSelector((state:RootState) => state.tasks.allTasks);
+    const tasks = useSelector((state: RootState) => state.tasks.tasks || []);
+    const loading = useSelector((state: RootState) => state.tasks.loading);
+   
+    console.log('有跑這裡嗎？！！！！！！',tasks)
     
+    const handleUpdateTask = (taskRefString:string, updatedData:Partial<Task>, taskId:string) => {
+        dispatch(updateTasksAsync({taskRefString, updatedData, taskId}));
+    } 
+
+    const handleDeleteTasks = (taskRefString:string, taskId:string) => {
+        dispatch(deleteTasksAsync({taskRefString, taskId}));
+    }
+
+    if(loading){
+        return <div className='loading-task'> <p>Loading tasks...</p><div className='loading-spinner'></div></div>
+    }
     return(
         
         <div>
@@ -59,23 +55,20 @@ const TaskList:React.FC<TaskProps> = ({tasks,setTasks,onUpdate,projects,onDelete
                 <TaskListTitle
                     key={`title-${task.id}`}
                     task={task}
-                    onUpdate = {onUpdate}
+                    onUpdate = {handleUpdateTask}
                 />
                 
 
                 <TaskListProject
                     key={`project-${task.id}`}
                     task={task}
-                    projects = {projects}
-                    setAllTasks={setAllTasks}
-                    setTasks={setTasks}
                 />
                 
                 <TaskListDate
                     key={`date-${task.id}`}
                     task={task}
-                    onUpdate = {onUpdate}
-                    onDelete = {onDelete}
+                    onUpdate = {handleUpdateTask}
+                    onDelete = {handleDeleteTasks}
                 
                 />
                 

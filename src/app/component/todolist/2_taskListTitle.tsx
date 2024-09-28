@@ -1,22 +1,10 @@
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { db } from "../../../../firebase";
-import { useAuth } from "../auth/authContext";
 
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    projectTitle: string;
-    createdAt: string;  
-}
+import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { useState } from "react";
+import { db } from '../../../../firebase'
+import { useAuth } from "../auth/authContext"; 
+import { Task } from "@/types/types";
+
 
 interface TaskListTitleProps{
     task: Task;
@@ -37,8 +25,6 @@ const TaskListTitle:React.FC<TaskListTitleProps> = ({task,onUpdate}) => {
         }
         try{
             //如果有帶project的話
-            
-            
             if(projectId){
                 const categoryQuery = query(collection(db,`project/${projectId}/category`));
                 const categorySnapshot = await getDocs(categoryQuery);

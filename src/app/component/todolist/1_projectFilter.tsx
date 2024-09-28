@@ -1,59 +1,27 @@
 import Image from "next/image"
-
-import {  useState } from "react";
-
-
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    projectTitle: string;
-    createdAt: string;  
-}
-
-interface Project {
-    id: string;
-    uid: string;
-    projectTitle: string;
-    projectStatus: string;
-    projectMember: string[];
-    projectDateStart: string;
-    projectDateEnd: string;
-    projectOwner: string | undefined;
-    createdAt: string;
-}
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { AppDispatch } from '@/store'
+import { setFilteredProject } from "@/features/tasksSlice"
+import { useEffect } from "react";
 
 
-interface TaskProjectFilterProps{
-    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;  
-    projects: Project[];
-    allTasks: Task[];
-    setSelectedProject: React.Dispatch<React.SetStateAction<string>>;
-    selectedProject: string;
-}
 
 
-const TaskProjectFilter:React.FC<TaskProjectFilterProps> = ({projects,setTasks,allTasks,setSelectedProject,selectedProject}) =>{
-
+const TaskProjectFilter = () =>{
+    const dispatch:AppDispatch = useDispatch();
+    
+    const projects = useSelector((state: RootState) => state.projects.projects)|| [];
+    const selectedProject = useSelector((state: RootState) => state.tasks.selectedProject);
 
     const handleSelectProjectFilter = (e:React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setSelectedProject(value);
-        if (value === ""){
-            setTasks(allTasks)
-        }else{
-            setTasks(allTasks.filter(tasks => tasks.projectId === value))
-        }
-        ;
-
+        const selectedProjectId = e.target.value;
+        dispatch(setFilteredProject(selectedProjectId));
     }
+
+    // useEffect(()=>{
+        
+    // },[dispatch])
 
     return (
         <>
@@ -70,12 +38,18 @@ const TaskProjectFilter:React.FC<TaskProjectFilterProps> = ({projects,setTasks,a
                             <option value="">All</option>
 
                             {/* 選單內容 */}
-                            {projects?.map(project => (
-                                <option key={project.id} value={project.id} >
-                                    {project.projectTitle}
-                                </option>
-
-                            ))}
+                            {projects.length > 0 ? (
+                                projects.map(project => (
+                                    <option key={project.id} value={project.id} >
+                                        {project.projectTitle}
+                                    </option>
+    
+                                ))
+                            ):
+                                (
+                                    <option value="">No projects available</option>
+                                )
+                            }
                     </select>
             </div>
     </>

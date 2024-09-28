@@ -3,23 +3,8 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useAuth } from '../auth/authContext';
 import SignOut from '../auth/signOut'
 import Image from 'next/image';
-import TodoListToggleTest from '../todolist/todolistTest/0_0todlistMain';
-
-interface Task {
-    id: string;
-    taskTitle: string;
-    taskStatus: string;
-    taskAssign: string[]|[];
-    taskNotAssign: string[]|[];
-    taskDate: string;
-    taskDescription: string;
-    taskOwner: string | null;
-    calendarId: string;
-    projectId: string;
-    projectTitle: string;
-    createdAt: string;  
-}
-
+import TodoListToggle from '../todolist/0_todolistMain';
+import { Task } from '@/types/types';
 
 
 const Navigation = () => {
@@ -83,7 +68,7 @@ const Navigation = () => {
                     
             </div>
             <div>
-                <TodoListToggleTest
+                <TodoListToggle
                     setIsTodlistShow={setIsTodlistShow}
                     isTodolistShow={isTodolistShow}
                 />
