@@ -1,6 +1,6 @@
 "use client"
 import {use, useEffect, useRef, useState} from 'react';
-import addEventToGoogleCalendar from './2_addNewEvent';
+import addEventToGoogleCalendar from './2_addEventToGoogleCalendaar';
 import ProjectOption from './4_projectOption';
 import { collection, query, where, getDocs, doc,updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../../../firebase';
@@ -337,7 +337,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                             onClick={()=> setShowNewProject(!showNewProject)}
                             >
                         <option value="0">None</option>
-                        {projects? 
+                        {Array.isArray(projects) ?
                             (projects?.map(project => (
                                 <ProjectOption
                                     key={project.id}
@@ -374,10 +374,18 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                                     <div className='sidebar-project-selectItems'>
                                         <button onClick={()=> handleAddNewProject()}><Image src="/images/add.svg" alt="task project" width={15} height={15}/>Add new project</button>
                                         <div  className="sidebar-project-selectItem" onClick={() => handleOptionClick(null)}> no project </div>
-                                        {projects?.map(project => (
-                                            <div key={project.id} className="sidebar-project-selectItem" onClick={() => handleOptionClick(project) } ><p>{project.projectTitle}</p></div> 
-                                        )
-                                        )}
+                                        {Array.isArray(projects) ?
+                                            (projects?.map(project => (
+                                                <div key={project.id} className="sidebar-project-selectItem" onClick={() => handleOptionClick(project) } ><p>{project.projectTitle}</p></div> )
+                                            ))
+                                            :
+                                            (
+                                                <>
+                                                <div className="sidebar-project-selectItem">no projects</div>
+                                                </>
+                                            )
+                                        
+                                        }
                                         
                                     </div>   
                                     

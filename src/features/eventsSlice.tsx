@@ -1,5 +1,5 @@
 //import { Event } from "@/types/types";
-import { createSlice, createAction, createAsyncThunk, current } from "@reduxjs/toolkit";
+import { createSlice, createAction, createAsyncThunk, current, PayloadAction } from "@reduxjs/toolkit";
 import { db } from '../../firebase'
 import { User } from "firebase/auth";
 import Cookies from 'js-cookie';
@@ -8,22 +8,11 @@ import { collection, deleteDoc, DocumentData, DocumentReference, getDocs, query,
 import { RootState } from "@/store"; 
 import { docs } from "googleapis/build/src/apis/docs";
 import { EventTask, Task,Project } from "@/types/types";
-import addEventToGoogleCalendar from "@/app/component/calendar/2_addNewEvent";
+import addEventToGoogleCalendar from "@/app/component/calendar/2_addEventToGoogleCalendaar";
 import { deleteTasksAsync,fetchTasks } from "./tasksSlice";
 import { useAuth } from "@/app/component/auth/authContext";
 import { fetchProjects } from "./projectsSlice";
-
-
-interface Event {
-    title: string;
-    id: string|null;
-    start: string;
-    end: string;
-    checkAllDay: boolean;
-    calendar: string;
-    description: string;
-    newProject: string|null;
-}
+import { Event } from "@/types/types";
 
 interface EventsState{
     events: Event[];
@@ -149,16 +138,47 @@ const eventsSlice = createSlice({
     name: "events",
     initialState,
     reducers:{
-        setEvents(state, action) {
+        //新增或更動一個事件
+        setUpdateEventDrug(state, action:PayloadAction<{start: string, end: string, allDay: boolean, updatedEvent: Event}>){
+            const {start, end, allDay, updatedEvent} = action.payload;
+            //設定使用者的時區
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            //查詢有沒有相同的id的events
+            state.events = state.events.map(event => {
+                if(event.id === updatedEvent.id){
+                    if(allDay){
+                        return{
+                            ...event, 
+                            start: { date: start},
+                            end: { date: end}
+                        }
+                    }else{
+                        const formattedStartDateTime = new Date(start).toISOString();
+                        const formattedEndDateTime = new Date(end).toISOString();
+                        return {
+                            ...event,
+                            start: { dateTime: formattedStartDateTime, timeZone: userTimeZone },
+                            end: { dateTime: formattedEndDateTime, timeZone: userTimeZone }
+                        };
+                    }
+                    
+                }
+                return event;
+            });
+            
+        }, 
+        //設置所有事件
+        setGoogleEvents(state, action) {
             state.events = action.payload ? [...state.events, ...action.payload] : state.events;
             state.loading = false;
-          },
-          setCalendars(state, action) {
-            state.calendars = action.payload || state.calendars;
-          },
-          setLoading(state, action) {
-            state.loading = action.payload;
-          },
+            console.log('所有的事件', state.events)
+        },
+        setCalendars(state, action) {
+        state.calendars = action.payload || state.calendars;
+        },
+        setLoading(state, action) {
+        state.loading = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -193,4 +213,4 @@ const eventsSlice = createSlice({
 })
 
 export default eventsSlice.reducer;
-export const { setEvents, setCalendars, setLoading } = eventsSlice.actions;
+export const { setGoogleEvents, setCalendars, setLoading,setUpdateEventDrug } = eventsSlice.actions;

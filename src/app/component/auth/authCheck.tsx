@@ -12,14 +12,13 @@ interface AuthContextType{
 const AuthCheck =  ({ children }: { children: ReactNode }) => {
     const {currentUser, loadingUser}:AuthContextType = useAuth();
     const router = useRouter();
-    console.log('check this function!!!!!!!!!!!!')
     useEffect (() =>{
     
         if(!loadingUser){
             if(currentUser){
-                console.log('有登入呦！',currentUser)
+                console.log('logged in',currentUser)
             }else{
-                console.log('確認一下not log in')
+                console.log('not log in')
                 router.push('/');
             }
             

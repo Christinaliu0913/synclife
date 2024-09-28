@@ -42,8 +42,8 @@ export interface Project {
 export interface Event {
     title: string;
     id: string|null;
-    start: string;
-    end: string;
+    start: string | { date: string } | { dateTime: string, timeZone: string };
+    end: string | { date: string } | { dateTime: string, timeZone: string };
     checkAllDay: boolean;
     calendar: string;
     description: string;

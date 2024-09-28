@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setEvents, setCalendars, setLoading } from '../../../../features/eventsSlice'
+import { setCalendars, setLoading, setGoogleEvents } from '../../../../features/eventsSlice'
 import { EventTask, Task,Project, Event } from "@/types/types";
 import { collection , getDocs, query, where } from "firebase/firestore";
 import { db } from '../../../../../firebase';
@@ -56,7 +56,7 @@ export const useFetchGoogleEvents = (token: string | undefined, projects: Projec
         const updatedEvents = await mapEventsWithProjects(allGoogleEvents, projects);
 
         // 更新 Redux 狀態
-        dispatch(setEvents(updatedEvents));
+        dispatch(setGoogleEvents(updatedEvents));
         dispatch(setCalendars(calendars));
       } catch (error) {
         console.error('Error fetching Google events', error);
@@ -79,7 +79,7 @@ async function readGoogleEvents(gapi: any) {
     if (calendar.accessRole === 'owner' || calendar.accessRole === 'writer') {
       const eventResponse = await gapi.client.calendar.events.list({
         calendarId: calendar.id,
-        timeMin: '2024-01-01T00:00:00Z',
+        timeMin: '2024-06-01T00:00:00Z',
         showDeleted: false,
         singleEvents: true,
         orderBy: 'startTime',

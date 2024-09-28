@@ -2,20 +2,9 @@
 import interactionPlugin from '@fullcalendar/interaction'
 import { gapi } from 'gapi-script';
 
-//changeInfo接受一個參數
-interface EventData {
-    title: string;
-    id: string|null;
-    start: string;
-    end: string;
-    checkAllDay: boolean;
-    calendar: string;
-    description: string;
-    newProject: string|null;
 
-}
 
-const addEventToGoogleCalendar = async(eventData:EventData) => {
+const addEventToGoogleCalendar = async(eventData:any) => {
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;//設定使用者的時區
     console.log('eventid test',eventData.id)
     try{
@@ -67,8 +56,8 @@ const addEventToGoogleCalendar = async(eventData:EventData) => {
         
         console.log('google API response', res)
         return {
-            ...eventData,
-            id: res.result.id
+            ...res.result,
+            ...eventData
         };
 
     }catch(error){

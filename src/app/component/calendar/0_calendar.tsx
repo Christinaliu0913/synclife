@@ -14,11 +14,12 @@ import { Task, Project } from '@/types/types';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { AppDispatch } from '@/store'
-import { deleteLocalEvent, fetchLocalEvents} from '@/features/eventsSlice';
+import { deleteLocalEvent, fetchLocalEvents, setLoading, setUpdateEventDrug, updateLocalEvent} from '@/features/eventsSlice';
 import { updateTaskProject, updateTasksAsync } from '@/features/tasksSlice';
 import EventSideBar from './2_EventSideBar';
 import { fetchProjects } from '@/features/projectsSlice';
 import { useFetchGoogleEvents } from './gapi/useFetchGoogleEvent';
+import addEventToGoogleCalendar from './2_addEventToGoogleCalendaar';
 
 
 
@@ -50,7 +51,7 @@ const CalendarComponent = () =>{
     // task
     const allTasks = useSelector((state:RootState) => state.tasks.allTasks);
     const taskLoading = useSelector((state: RootState) => state.tasks.loading);
-    // project                                                                                                                                                                                                                                                                                                                                    e) => state.projects.projects);
+    // project                                                                                                                                                                                                                                                                                          
     const projectLoading = useSelector((state: RootState) => state.projects.loading);
     // event
     const events = useSelector((state:RootState) => state.events.events)
@@ -64,19 +65,8 @@ const CalendarComponent = () =>{
         
     }, [currentUser, allTasks]);
     //載入google events
-    
-        useFetchGoogleEvents(token, projects, dispatch);
+    useFetchGoogleEvents(token, projects, dispatch);
    
-    // useEffect(() => {
-    //     if(token){
-    //         dispatch(fetchGoogleEvents(token));
-    //     }else{
-    //         console.log('Token not found');
-    //     }
-        
-    // }, [token]);
-    // console.log('taskevent',events);
-
 
     //點擊日曆時間段新增event
     const handleDateClick = (info:any)=> {
@@ -229,56 +219,64 @@ const CalendarComponent = () =>{
     }
 
     //拖曳更新時間
-    // const handleEventDrop= async( info :any) => {
-    //     const event = info.event;
+    const handleEventDrop= async( info :any) => {
+        const event = info.event;
         
-    //     const isGoogleCalendarEvents = event.extendedProps.taskType === 'googleEvent';
-    //     const isLocalTaskEvents = event.extendedProps.taskType === 'task';
-    //     const isLocalEvents = event.extendedProps.taskType ==='event';
+        const isGoogleCalendarEvents = event.extendedProps.taskType === 'googleEvent';
+        const isLocalTaskEvents = event.extendedProps.taskType === 'task';
+        const isLocalEvents = event.extendedProps.taskType ==='event';
+        const start = event.startStr;
+        const end = event.endStr;
+        const allDay = event.allDay;
+        console.log('ckckckckckckckc',event._def)
+        const updatedEventData = {
+            title: event.title,
+            id: event.id,
+            start: event.startStr,
+            end: event.endStr,
+            calendar: 'primary',
+            checkAllDay:event.allDay,
+            description: event.extendedProps.description ||'',
+            newProject: event.extendedProps.project || 'default'
+        };
 
-    //     const updatedEventData = {
-    //         title: event.title,
-    //         id: event.id,
-    //         start: event.startStr,
-    //         end: event.endStr,
-    //         calendar: 'primary',
-    //         checkAllDay:event.allDay,
-    //         description: event.extendedProps.description ||'',
-    //         newProject: event.extendedProps.project || 'default'
-    //     };
+        try{
+            let updatedEvent = null;
+            //檢查是否連到google calendar
+            if( isGoogleCalendarEvents ){
+                if(!token){
+                    throw new Error('No Google Calendar token found.')
+                }
 
-    //     try{
+                //更新 google calendar 上的events
+                //這邊讓addEvent function 來整理邏輯（是否為新增的資料還是有帶id的event
+                updatedEvent = await addEventToGoogleCalendar(updatedEventData);
 
-    //         //檢查是否連到google calendar
-    //         if( isGoogleCalendarEvents ){
-    //             if(!token){
-    //                 throw new Error('No Google Calendar token found.')
-    //             }
+                //要更新redux store的event
 
-    //             //更新 google calendar 上的events
-    //             //這邊讓addEvent function 來整理邏輯（是否為新增的資料還是有帶id的event
-    //             const updatedEvent = await addEventToGoogleCalendar(updatedEventData);
+            }
+            //如果是localEvent
+            else if(isLocalEvents){ 
+                const eventId = event.id;
+                const eventDef = doc(db, `event/${currentUser?.uid}/event`, eventId);
+                dispatch(updateLocalEvent({eventDef,updatedEventData,eventId}))
+                updatedEvent = {...updatedEventData, id: eventId};
+            }
+            else{
+                console.log('Task不可變動',event);
+                return 
+            }
+            // 如果更新成功，将更新的事件传递给 setUpdateEvent
+            if (updatedEvent) {
 
-    //             //要更新redux store的event
-    //            if(updatedEvent){
-    //             dispatch(fetchGoogleEvents(token))
-    //            }
-
-    //         }
-    //         //如果是localEvent
-    //         else if(isLocalEvents){ 
-    //             const eventId = event.id;
-    //             const eventDef = doc(db, `event/${currentUser?.uid}/event`, eventId);
-    //             dispatch(updateLocalEvent({eventDef,updatedEventData,eventId}))
-    //         }
-    //         else{
-    //             console.log('Task不可變動',event);
-    //             return 
-    //         }
-    //     }catch(error){
-    //         console.log('拖曳更新時出錯',error)
-    //     }
-    // }
+                //  Redux 的 setUpdateEvent
+                dispatch(setUpdateEventDrug({start, end, allDay,updatedEvent}));
+                console.log('以拖拉更新后的事件:', );
+            }
+        }catch(error){
+            console.log('拖曳更新時出錯',error)
+        }
+    }
 
     //刪除event
     const handleDeleteEvent= async(eventId:string,selectedEventType:string) =>{
@@ -367,7 +365,7 @@ const CalendarComponent = () =>{
             select={(info)=>handleDateClick(info)}
             //編輯event
             eventClick={handleEventClick}
-            //eventDrop={handleEventDrop}
+            eventDrop={handleEventDrop}
             eventContent={renderEventContent}
         
             />
