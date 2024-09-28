@@ -99,33 +99,39 @@ async function readGoogleEvents(gapi: any) {
 
 // 卻任是否帶有project
 async function mapEventsWithProjects(googleEvents: any[], projects: Project[]) {
-  
-  return Promise.all(
-    googleEvents.map(async (event) => {
+  // 創一個map來儲存所有項目的task
+  const projectTaskMap: Record<string, any[]> = {};
+
+  for (const proj of projects) {
+    const categoryQuery = query(collection(db, `project/${proj.id}/category`));
+    const categorySnapshot = await getDocs(categoryQuery);
+
+    for (const categoryDoc of categorySnapshot.docs) {
+      const taskQuery = query(
+        collection(db, `project/${proj.id}/category/${categoryDoc.id}/task`)
+      );
+      
+      const taskSnapshot = await getDocs(taskQuery);
+      projectTaskMap[proj.id] = taskSnapshot.docs.map((doc) => doc.data());
+    }
+  }
+  console.log(projectTaskMap)
+
+  //使用已經查少的task資料來更新googleEvents
+  const mappedEvents = googleEvents.map(async (event) => {
       let projectId = '';
       let projectTitle = '';
       const calendarType = event.organizer.displayName;
 
       //在項目中看有沒有這個calendar.id的task
-      for (const proj of projects) {
-        const categoryQuery = query(collection(db, `project/${proj.id}/category`));
-        const categorySnapshot = await getDocs(categoryQuery);
-
-        for (const categoryDoc of categorySnapshot.docs) {
-          const taskQuery = query(
-            collection(db, `project/${proj.id}/category/${categoryDoc.id}/task`),
-            where('calendarId', '==', event.id)
-          );
-          const taskSnapshot = await getDocs(taskQuery);
-
-          if (!taskSnapshot.empty) {
-            const taskData = taskSnapshot.docs[0].data();
-            projectId = taskData.projectId || projectId;
+      for (const proj of projects){
+          const relatedTasks = projectTaskMap[proj.id]?.filter((task) => task.calendarId === event.id)||[];
+          if (relatedTasks.length > 0 ){
+            const taskData = relatedTasks[0];
+            projectId = taskData.projectId || '';
             projectTitle = proj.projectTitle || '';
           }
-        }
       }
-
       return {
         ...event,
         taskType: 'googleEvent',
@@ -134,5 +140,5 @@ async function mapEventsWithProjects(googleEvents: any[], projects: Project[]) {
         calendarType: calendarType,
       };
     })
-  );
+  return Promise.all(mappedEvents);
 }

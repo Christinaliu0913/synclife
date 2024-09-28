@@ -3,6 +3,7 @@ import { db } from '../../firebase'
 import { query, where, collection, getDocs, addDoc, doc, deleteDoc, updateDoc, DocumentReference, DocumentData, setDoc } from 'firebase/firestore'
 import { Category, Project } from "@/types/types";
 import { User } from "firebase/auth";
+import { RootState } from "@/store";
 
 
 
@@ -17,26 +18,28 @@ const initialState: CategoriesState = {
 
 //fetch Cate
 export const fetchCategories =createAsyncThunk('categories/fetchCategories',
-    async(currentUser:User|null) => {
+    async(currentUser:User|null, { getState }) => {
         if(!currentUser) return; 
-        let categories:Category[] = [];
+    
         
+        const state = getState() as RootState;
+        const projects = state.projects.projects;
+
+        let categories:Category[] = [];
         try{
-            const projectQuery = query(collection(db, 'project'), where('projectMember','array-contains',currentUser.email));
-            const projectSnapshot = await getDocs(projectQuery);
-
-            for (const projectDoc of projectSnapshot.docs){
-                const projectId = projectDoc.id;
-
-                const categoryQuery = query(collection(db,`project/${projectId}/category`));
-                const querySnapshot = await getDocs(categoryQuery);
-
-                const fetchedCategories = querySnapshot.docs.map(doc =>({
-                    id:doc.id,
-                    ...doc.data()
-                })as Category);
-
-                categories.push(...fetchedCategories);
+            if(projects.length > 0){
+                for (const projectDoc of projects){
+                    const projectId = projectDoc.id;
+                    const categoryQuery = query(collection(db,`project/${projectId}/category`));
+                    const querySnapshot = await getDocs(categoryQuery);
+    
+                    const fetchedCategories = querySnapshot.docs.map(doc =>({
+                        id:doc.id,
+                        ...doc.data()
+                    })as Category);
+    
+                    categories.push(...fetchedCategories);
+                }
             }
             
         }catch(error){

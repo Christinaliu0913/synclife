@@ -17,8 +17,14 @@ const initialState: ProjectsState ={
 }
 
 //fetch Project
-export const fetchProjects = createAsyncThunk('projects/fetchProjects', async(currentUser: User|null)=>{
+export const fetchProjects = createAsyncThunk('projects/fetchProjects', async(currentUser: User|null, {getState})=>{
     if(!currentUser) return {tasks:[], projects:[]};
+
+    //先從redux狀態中取得目前的projects 
+    const state = getState() as {projects: ProjectsState};
+    if (state.projects.projects.length > 0){
+        return state.projects.projects;//已有專案資料，直接返回（減少firebase查詢次數）
+    }
     let projects = [];
     const projectQuery = query(collection(db, 'project'), where('projectMember','array-contains',currentUser.email));
     const projectSnapshot = await getDocs(projectQuery);

@@ -5,6 +5,7 @@ import { User } from "firebase/auth";
 import { Task, Project } from "@/types/types";
 import { tasks } from "googleapis/build/src/apis/tasks";
 import { create } from "domain";
+import { RootState } from "@/store";
 
 
 //設定接口
@@ -221,10 +222,15 @@ export const fetchProjectTasks = createAsyncThunk('tasks/fetchProjectTasks',
 
 
 //fetch Tasks and tasks project
-export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser:User|null) => {
+export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser:User|null, { getState }) => {
     if(!currentUser) return {tasks:[], projects:[]};
     let tasks = [];
-    let projects = [];
+    
+    //從ProjectsSlice取得project狀態
+    const state = getState() as RootState;
+    const projects = state.projects.projects;
+    const categories = state.categories.categories;
+
     //noProject Tasks
     const noProjectQuery = query(collection(db, `noProject/${currentUser.uid}/task`));
     const noProjectSnapshot = await getDocs(noProjectQuery);
@@ -234,21 +240,10 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser
     })as Task)
     tasks.push(...noProjectTasks);
  
-    //With Project 且被 assigned的tasks
-    const projectQuery = query(collection(db, 'project'), where('projectMember','array-contains',currentUser.email));
-    const projectSnapshot = await getDocs(projectQuery);
-    const currentUserProjects = projectSnapshot.docs.map(doc =>({
-        id:doc.id, 
-        ...doc.data()
-    }) as Project);
-    //目前有哪些project 
-    projects.push(...currentUserProjects);
 
     //在目前有的project中看每個cat的每個task中有沒有被assigned
-    for (const project of currentUserProjects){
-        const categoryQuery  = query(collection(db, `project/${project.id}/category`))
-        const categorySnapshot = await getDocs(categoryQuery);
-        for (const cat of categorySnapshot.docs){
+    for (const project of projects){
+        for (const cat of categories){
             const taskQuery = query(collection(db, `project/${project.id}/category/${cat.id}/task`),
             where('taskAssign', 'array-contains', currentUser.email)
         );

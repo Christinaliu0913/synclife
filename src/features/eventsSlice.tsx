@@ -168,6 +168,9 @@ const eventsSlice = createSlice({
             
         }, 
         //設置所有事件
+        setUpdateGoogleEvent(state, action){
+
+        },
         setGoogleEvents(state, action) {
             state.events = action.payload ? [...state.events, ...action.payload] : state.events;
             state.loading = false;
@@ -213,4 +216,4 @@ const eventsSlice = createSlice({
 })
 
 export default eventsSlice.reducer;
-export const { setGoogleEvents, setCalendars, setLoading,setUpdateEventDrug } = eventsSlice.actions;
+export const { setGoogleEvents, setCalendars, setLoading, setUpdateEventDrug, setUpdateGoogleEvent } = eventsSlice.actions;
