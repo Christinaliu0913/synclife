@@ -14,9 +14,7 @@ export default function Home() {
   return (
     <>
       <nav className="hp-nav">
-        
-        <Image className="hp-navlogo" src='/images/logoLight.svg' alt="logo" width={100} height={50}></Image>
-        
+        <a href="/"><Image className="hp-navlogo" src='/images/logoLight.svg' alt="logo" width={100} height={50}></Image></a>
       </nav>
       <div className="hp-main">
         <div className="hp-logo" >

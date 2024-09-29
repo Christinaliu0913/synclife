@@ -6,6 +6,7 @@ import { Task, Project } from "@/types/types";
 import { tasks } from "googleapis/build/src/apis/tasks";
 import { create } from "domain";
 import { RootState } from "@/store";
+import { setLoading } from "./eventsSlice";
 
 
 //設定接口
@@ -222,9 +223,11 @@ export const fetchProjectTasks = createAsyncThunk('tasks/fetchProjectTasks',
 
 
 //fetch Tasks and tasks project
-export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser:User|null, { getState }) => {
+export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser:User|null, thunkAPI) => {
+    const { getState , dispatch } = thunkAPI;//從thunkAPI獲取dispatch和getState
     if(!currentUser) return {tasks:[], projects:[]};
     let tasks = [];
+    
     
     //從ProjectsSlice取得project狀態
     const state = getState() as RootState;

@@ -12,6 +12,7 @@ import { di } from 'node_modules/@fullcalendar/core/internal-common';
 import { useAuth } from '../auth/authContext';
 import { current } from '@reduxjs/toolkit';
 import { Root } from 'postcss';
+import { fetchProjects } from '@/features/projectsSlice';
 
 
 
@@ -24,7 +25,9 @@ const TaskList = () => {
    
     useEffect(()=>{
         if(currentUser){
-            dispatch(fetchTasks(currentUser));
+            dispatch(fetchProjects(currentUser)).then(()=>{
+                dispatch(fetchTasks(currentUser));
+            })
         }
 
     },[currentUser, dispatch])

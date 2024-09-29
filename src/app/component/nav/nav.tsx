@@ -25,9 +25,9 @@ const Navigation = () => {
                 <button onClick={handleNavShow}>
                     ☰
                 </button>
-                <div className='sidebar-phone-Img'>
+                <a href="/pages" className='sidebar-phone-Img'>
                     <Image src='/images/logoLight.svg' alt="logo" width={100} height={50}></Image>
-                </div>
+                </a>
             </div>
             <div className={`sidebar ${isSidebarVisible? 'sidebar':'sidebar-phone-show'}`}>
                 <button className='sidebar-phone-close' onClick={handleNavShow}>x</button>

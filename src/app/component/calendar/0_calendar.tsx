@@ -235,7 +235,7 @@ const CalendarComponent = () =>{
             start: event.startStr,
             end: event.endStr,
             calendar: 'primary',
-            checkAllDay:event.allDay,
+            checkAllDay: allDay,
             description: event.extendedProps.description ||'',
             newProject: event.extendedProps.project || 'default'
         };
@@ -270,7 +270,7 @@ const CalendarComponent = () =>{
             if (updatedEvent) {
 
                 //  Redux 的 setUpdateEvent
-                dispatch(setUpdateEventDrug({start, end, allDay,updatedEvent}));
+                dispatch(setUpdateEventDrug({start, end, allDay, updatedEvent}));
                 console.log('以拖拉更新后的事件:', );
             }
         }catch(error){

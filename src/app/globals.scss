@@ -17,6 +17,36 @@ $yellow-hovor: #FFE5A3;
     transform: rotate(360deg);
   }
 }
+
+.loading-task{
+  display: flex;
+  align-items: center;
+  color: $greyLight;
+  font-size:16px;
+}
+.loading{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $greyLight;
+  position: relative;
+  top: 70px;
+  font-size:20px;
+}
+.loading-spinner{
+  width: 15px;
+  height: 15px;
+  margin: 5px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-top-color: $primary-color; /* 旋轉的顏色 */
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+  to {
+      transform: rotate(360deg);
+  }
+}
 .hp-logo{
   position: relative;
 }
@@ -33,11 +63,14 @@ body{
   color: #5B5B5B;
 }
 .hp-nav{
+  position:fixed;
+  width: 100%;
   background-color:$primary-color;
   display: flex;
   align-items: center;
   height: 55px;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 .hp-navlogo{
   margin: 10px;
