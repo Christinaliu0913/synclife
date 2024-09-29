@@ -15,29 +15,7 @@ $blue: #5b95ad;
     font-size: 16px;
     display: flex;
   }
-.loading{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: $greyLight;
-    position: relative;
-    top: 70px;
-    font-size:20px;
-}
-.loading-spinner{
-    width: 15px;
-    height: 15px;
-    margin: 5px;
-    border: 5px solid rgba(0, 0, 0, 0.1);
-    border-top-color: $primary-color; /* 旋轉的顏色 */
-    border-radius: 50%;
-    animation: spin 1s ease-in-out infinite;
-}
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
+
 .noproject-text{
     position: relative;
     top: 70px;
