@@ -124,7 +124,8 @@ const CalendarComponent = () =>{
         }
         //若是是一個普通事件，使用默認的顯示樣式
         return( 
-            <div>
+            <>
+                <div style={{backgroundColor:'#C07767'}}>
                 <b>{eventInfo.event.title}</b><br />
                 {eventInfo.event.extendedProps.calendarType?
                     (<><i>{eventInfo.event.extendedProps.calendarType}</i><br /></>):
@@ -133,6 +134,8 @@ const CalendarComponent = () =>{
                 
                 <i>{eventInfo.event.extendedProps.projectTitle}</i>
             </div> 
+            </>
+            
         )
     }
 
@@ -221,7 +224,8 @@ const CalendarComponent = () =>{
     //拖曳更新時間
     const handleEventDrop= async( info :any) => {
         const event = info.event;
-        
+        const project = projects.find((proj) => proj.id === event.extendedProps.projec);
+        const projectTitle = project ? project.projectTitle : '';
         const isGoogleCalendarEvents = event.extendedProps.taskType === 'googleEvent';
         const isLocalTaskEvents = event.extendedProps.taskType === 'task';
         const isLocalEvents = event.extendedProps.taskType ==='event';
@@ -237,8 +241,22 @@ const CalendarComponent = () =>{
             calendar: 'primary',
             checkAllDay: allDay,
             description: event.extendedProps.description ||'',
-            newProject: event.extendedProps.project || 'default'
+            project: event.extendedProps.project || 'default'
         };
+
+        const updatedlocalEventData = {
+            title: event.title,
+            start: event.startStr,
+            end: event.endStr,
+            checkAllDay: allDay,
+            description: event.extendedProps.description ||'',
+            taskStatus: 'Unstarted',
+            projectTitle: '',
+            projectId: event.extendedProps.projec || '',
+            createdAt: new Date().toISOString(),
+            taskType: 'event',
+            id: event.id,
+        }
 
         try{
             let updatedEvent = null;
@@ -259,7 +277,7 @@ const CalendarComponent = () =>{
             else if(isLocalEvents){ 
                 const eventId = event.id;
                 const eventDef = doc(db, `event/${currentUser?.uid}/event`, eventId);
-                dispatch(updateLocalEvent({eventDef,updatedEventData,eventId}))
+                dispatch(updateLocalEvent({eventDef,updatedlocalEventData,eventId}))
                 updatedEvent = {...updatedEventData, id: eventId};
             }
             else{

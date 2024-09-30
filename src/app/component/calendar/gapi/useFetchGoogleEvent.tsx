@@ -6,6 +6,7 @@ import { setCalendars, setLoading, setGoogleEvents } from '../../../../features/
 import { EventTask, Task,Project, Event } from "@/types/types";
 import { collection , getDocs, query, where } from "firebase/firestore";
 import { db } from '../../../../../firebase';
+import { settingGoogleEvents } from './2_settingGoogleEvents';
 
 
 export const useFetchGoogleEvents = (token: string | undefined, projects: Project[],dispatch:any) => {
@@ -50,14 +51,14 @@ export const useFetchGoogleEvents = (token: string | undefined, projects: Projec
         });
 
         // 調用 readGoogleEvents 函式
-        const { allGoogleEvents, calendars } = await readGoogleEvents(gapi);
+        const  allGoogleEvents  = await readGoogleEvents(gapi);
 
         // 將專案連結到事件上
         const updatedEvents = await mapEventsWithProjects(allGoogleEvents, projects);
 
         // 更新 Redux 狀態
         dispatch(setGoogleEvents(updatedEvents));
-        dispatch(setCalendars(calendars));
+        //dispatch(setCalendars(calendars));
       } catch (error) {
         console.error('Error fetching Google events', error);
       } finally {
@@ -66,35 +67,36 @@ export const useFetchGoogleEvents = (token: string | undefined, projects: Projec
     };
 
     fetchEvents();
-  }, [token, dispatch, projects]);
+  }, [token, projects, dispatch]);
 };
 
 // 讀取 Google 活動
 async function readGoogleEvents(gapi: any) {
   const calendarList = await gapi.client.calendar.calendarList.list();
   const calendars = calendarList.result.items || [];
-
+  
   let allGoogleEvents: any[] = [];
-  for (const calendar of calendars) {
-    if (calendar.accessRole === 'owner' || calendar.accessRole === 'writer') {
-      const eventResponse = await gapi.client.calendar.events.list({
-        calendarId: calendar.id,
-        timeMin: '2024-06-01T00:00:00Z',
-        showDeleted: false,
-        singleEvents: true,
-        orderBy: 'startTime',
-      });
-      const events = eventResponse.result.items || [];
-      const colorTypeEvents = events.map((event: any) => ({
-        ...event,
-        color: calendar.backgroundColor,
-        taskType: 'googleEvent',
-      }));
-
-      allGoogleEvents = [...allGoogleEvents, ...colorTypeEvents];
+    for (const calendar of calendars) {
+      if (calendar.accessRole === 'owner' || calendar.accessRole === 'writer') {
+        const eventResponse = await gapi.client.calendar.events.list({
+          calendarId: calendar.id,
+          timeMin: '2024-9-28T00:00:00Z',
+          showDeleted: false,
+          singleEvents: true,
+          orderBy: 'startTime',
+        });
+        const events = eventResponse.result.items || [];
+        const colorTypeEvents = events.map((event: any) => ({
+          ...event,
+          color: calendar.backgroundColor,
+          taskType: 'googleEvent',
+        }));
+  
+        allGoogleEvents = [...allGoogleEvents, ...colorTypeEvents];
+      }
     }
-  }
-  return { allGoogleEvents, calendars };
+  
+  return  allGoogleEvents ;
 }
 
 // 卻任是否帶有project

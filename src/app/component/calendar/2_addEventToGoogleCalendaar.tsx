@@ -1,6 +1,10 @@
 'use client'
 import interactionPlugin from '@fullcalendar/interaction'
 import { gapi } from 'gapi-script';
+import { settingGoogleEvents } from './gapi/2_settingGoogleEvents';
+import { AppDispatch } from '@/store';
+import { useDispatch } from 'react-redux';
+import { setGoogleEvents } from '@/features/eventsSlice';
 
 
 
@@ -45,6 +49,7 @@ const addEventToGoogleCalendar = async(eventData:any) => {
                 eventId: eventData.id,
                 resource: eventResource,
             });
+            
             console.log('google API response', res)
         }else{
             //沒有id添加event
@@ -52,12 +57,14 @@ const addEventToGoogleCalendar = async(eventData:any) => {
                 calendarId: 'primary',
                 resource: eventResource,
             });
+           
         }
         
         console.log('google API response', res)
         return {
             ...res.result,
-            ...eventData
+            ...eventData,
+            id: res.result?.id,
         };
 
     }catch(error){

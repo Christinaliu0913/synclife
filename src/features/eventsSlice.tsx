@@ -94,13 +94,13 @@ export const updateGoogleEvent = createAsyncThunk('events/updateGoogleEvent',
 )
 //update local event
 export const updateLocalEvent = createAsyncThunk('events/addlocalEvent',
-    async({eventDef,updatedEventData,eventId}:{eventDef:DocumentReference<DocumentData>,updatedEventData:{},eventId:string}) => {
+    async({eventDef,updatedlocalEventData,eventId}:{eventDef:DocumentReference<DocumentData>,updatedlocalEventData:{},eventId:string}) => {
         try{
-            await updateDoc(eventDef, updatedEventData as DocumentData)
+            await updateDoc(eventDef, updatedlocalEventData as DocumentData)
         }catch(error){
             console.log('更新localEvent時錯誤',error);
         }
-        return {eventId, updatedEventData}
+        return {eventId, updatedlocalEventData}
     }
 )
 
@@ -167,14 +167,16 @@ const eventsSlice = createSlice({
             });
             
         }, 
-        //設置所有事件
-        setUpdateGoogleEvent(state, action){
-
+        setAddEvent(state, action){
+            state.events = action.payload ? [...state.events, ...action.payload] : state.events;
+            state.loading = false;
+            console.log('更新的事件',action.payload )
         },
         setGoogleEvents(state, action) {
             state.events = action.payload ? [...state.events, ...action.payload] : state.events;
             state.loading = false;
-            console.log('所有的事件', state.events)
+            console.log('更新的事件',action.payload )
+            console.log('所有的事件被觸發', state.events)
         },
         setCalendars(state, action) {
         state.calendars = action.payload || state.calendars;
@@ -216,4 +218,4 @@ const eventsSlice = createSlice({
 })
 
 export default eventsSlice.reducer;
-export const { setGoogleEvents, setCalendars, setLoading, setUpdateEventDrug, setUpdateGoogleEvent } = eventsSlice.actions;
+export const { setGoogleEvents, setCalendars, setLoading, setUpdateEventDrug,setAddEvent } = eventsSlice.actions;
