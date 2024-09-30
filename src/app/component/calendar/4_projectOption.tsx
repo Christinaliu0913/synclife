@@ -27,3 +27,4 @@ const ProjectOption: React.FC<ProjectListProps> = ({project}) => {
 }
 
 export default ProjectOption;
+
