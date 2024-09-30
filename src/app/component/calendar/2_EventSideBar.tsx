@@ -359,7 +359,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     
                 
 
-                <div className='sidebar-project'>
+                <div style={{display:"none"}} className='sidebar-project'>
                     
                     <Image className='sidebar-projectImg' src="/images/Folder_light.svg" alt="task project" width={25} height={25}/>
                     <label htmlFor="project">Project</label>
@@ -415,7 +415,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                         {showProjectSelect && 
                             (
                                 <>
-                                    {/* <div className='sidebar-overlay'></div> */}
+                                    <div className='sidebar-overlay'></div>
                                     <div className='sidebar-project-selectItems'>
                                         <button onClick={()=> handleAddNewProject()}><Image src="/images/add.svg" alt="task project" width={15} height={15}/>Add new project</button>
                                         <div  className="sidebar-project-selectItem" onClick={() => handleOptionClick(null)}> no project </div>

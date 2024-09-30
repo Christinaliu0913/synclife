@@ -523,6 +523,7 @@ body{
   }
 }
 .sidebar-project-select{
+  text-indent: 5px;
   position: relative;
   width: 100%;
   height: 30px;
@@ -531,6 +532,7 @@ body{
   background-color: #fff;
   display: flex;
   align-items: center;
+  cursor: pointer;
   
 }
 .sidebar-project-select-toggle{

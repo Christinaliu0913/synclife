@@ -125,7 +125,7 @@ const CalendarComponent = () =>{
         //若是是一個普通事件，使用默認的顯示樣式
         return( 
             <>
-                <div style={{backgroundColor:'#C07767'}}>
+                <div >
                 <b>{eventInfo.event.title}</b><br />
                 {eventInfo.event.extendedProps.calendarType?
                     (<><i>{eventInfo.event.extendedProps.calendarType}</i><br /></>):
