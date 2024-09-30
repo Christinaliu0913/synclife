@@ -13,6 +13,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { AppDispatch } from '@/store'
 import { fetchProjects } from '@/features/projectsSlice';
+import { settingGoogleEvents } from './gapi/2_settingGoogleEvents';
+import { gapi } from 'gapi-script';
+import { setAddEvent, setGoogleEvents } from '@/features/eventsSlice';
 
 
 interface EventSideBarProps{
@@ -158,7 +161,8 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             id: selectedEventId? selectedEventId : null
         };
         const endTimeSet = end.slice(0,10);
-        
+        const project = projects.find((proj) => proj.id === newProject);
+        const projectTitle = project ? project.projectTitle : '';
 
         try{
             //先確認有沒有連到google calendar
@@ -167,10 +171,36 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                 await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
                 //將資料傳給google
                 const addedEvent = await addEventToGoogleCalendar(newEventData);
-
-                // if(addedEvent){
-                //     dispatch(fetchGoogleEvents(token))
-                // }
+                
+                if(addedEvent){
+                    if(addedEvent.checkAllDay){
+                        const allGoogleEvents  = [{
+                        ...addedEvent,
+                        id: addedEvent.id,
+                        start: { date: start},
+                        end: { date: end},
+                        color: addedEvent.backgroundColor,
+                        taskType: 'googleEvent',
+                        }];
+                        dispatch(setGoogleEvents(allGoogleEvents));
+                    }else{
+                        console.log('asldkfjalsdfj;alsdkjf', addedEvent.id)
+                        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        const formattedStartDateTime = new Date(start).toISOString();
+                        const formattedEndDateTime = new Date(end).toISOString();
+                        const allGoogleEvents  = [{
+                            ...JSON.parse(JSON.stringify(addedEvent)),
+                            id: addedEvent.id,
+                            start: { dateTime: formattedStartDateTime, timeZone: userTimeZone },
+                            end: { dateTime: formattedEndDateTime, timeZone: userTimeZone },
+                            color: addedEvent.backgroundColor,
+                            taskType: 'googleEvent',
+                        }];
+                        dispatch(setGoogleEvents(allGoogleEvents));
+                    }
+                    
+                    
+                }
             }else{
                 console.log('without google calendar auth, save in local');
                 const newEventRef = doc(collection(db, `event/${currentUser?.uid}/event`))
@@ -185,6 +215,21 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     projectId: newProject || '',
                     createdAt: new Date().toISOString()
                 })
+                const localEvent = [{
+                    title: title || '',
+                    start: start,
+                    end: end,
+                    checkAllDay: checkAllDay,
+                    description: description || '',
+                    taskStatus: 'Unstarted',
+                    projectTitle: projectTitle||'',
+                    projectId: newProject || '',
+                    createdAt: new Date().toISOString(),
+                    taskType: 'event',
+                    id: newEventRef.id,
+                }];
+                dispatch(setAddEvent(localEvent));
+
             }
 
 
@@ -314,7 +359,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     
                 
 
-                <div className='sidebar-project'>
+                <div style={{display:"none"}} className='sidebar-project'>
                     
                     <Image className='sidebar-projectImg' src="/images/Folder_light.svg" alt="task project" width={25} height={25}/>
                     <label htmlFor="project">Project</label>
@@ -370,7 +415,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                         {showProjectSelect && 
                             (
                                 <>
-                                    {/* <div className='sidebar-overlay'></div> */}
+                                    <div className='sidebar-overlay'></div>
                                     <div className='sidebar-project-selectItems'>
                                         <button onClick={()=> handleAddNewProject()}><Image src="/images/add.svg" alt="task project" width={15} height={15}/>Add new project</button>
                                         <div  className="sidebar-project-selectItem" onClick={() => handleOptionClick(null)}> no project </div>
