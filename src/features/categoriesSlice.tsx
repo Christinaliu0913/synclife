@@ -41,7 +41,7 @@ export const fetchCategories =createAsyncThunk('categories/fetchCategories',
                     categories.push(...fetchedCategories);
                 }
             }
-            
+            console.log('確認這裡',categories)
         }catch(error){
             console.log('獲取category出錯',error)
         }

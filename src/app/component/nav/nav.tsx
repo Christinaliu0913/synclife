@@ -12,7 +12,7 @@ const Navigation = () => {
     const userName = currentUser? (currentUser.displayName ): ('Set your name')
     const userEmail = currentUser? currentUser.email: null;
     const [isSidebarVisible, setIsSidebarVisible] = useState(true)
-    const [isTodolistShow, setIsTodlistShow] = useState(false);
+    const [isTodolistShow, setIsTodolistShow] = useState(false);
     const handleNavShow = () => {
         setIsSidebarVisible(!isSidebarVisible);
     }
@@ -46,7 +46,7 @@ const Navigation = () => {
                         <li>
                             <span  >
                                 <Image src="/images/check-contained.png" alt="Description" width={20} height={20} className='menu-listImg'/>
-                                <a onClick={()=>setIsTodlistShow(!isTodolistShow)}>To do list</a>
+                                <a onClick={()=>setIsTodolistShow(!isTodolistShow)}>To do list</a>
                             </span> 
                         </li>
                         <li>
@@ -69,7 +69,7 @@ const Navigation = () => {
             </div>
             <div>
                 <TodoListToggle
-                    setIsTodlistShow={setIsTodlistShow}
+                    setIsTodolistShow={setIsTodolistShow}
                     isTodolistShow={isTodolistShow}
                 />
             </div>

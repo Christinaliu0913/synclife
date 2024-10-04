@@ -16,7 +16,7 @@ import { fetchProjects } from '@/features/projectsSlice';
 
 
 
-const TaskList = () => {
+const TaskListTest = () => {
     //Store data
     const dispatch:AppDispatch = useDispatch();
     const { currentUser } = useAuth();
@@ -83,4 +83,4 @@ const TaskList = () => {
         </div>
     );
 }
-export default TaskList;
+export default TaskListTest;

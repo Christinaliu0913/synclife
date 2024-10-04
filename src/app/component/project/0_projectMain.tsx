@@ -23,15 +23,11 @@ const ProjectMain = () => {
 
     //先fetch這個人的資料
     useEffect(()=>{
-        dispatch(fetchProjects(currentUser))
+        dispatch(fetchProjects(currentUser)).then(()=>{
+            dispatch(fetchCategories(currentUser));
+        })
     },[currentUser,dispatch])
     
-    useEffect(()=>{
-        if(currentUser){
-            dispatch(fetchCategories(currentUser))
-        }
-        
-    },[currentUser,dispatch])
 
    
     return (

@@ -6,23 +6,23 @@ import { Dispatch, SetStateAction } from 'react';
 
 
 interface TodoListProps{
-    setIsTodlistShow: Dispatch<SetStateAction<boolean>>;
+    setIsTodolistShow: Dispatch<SetStateAction<boolean>>;
     isTodolistShow: boolean;
 }
 
 
-const TodoListToggle:React.FC<TodoListProps> = ({setIsTodlistShow,isTodolistShow}) => {
+const TodoListToggle:React.FC<TodoListProps> = ({setIsTodolistShow,isTodolistShow}) => {
     
 
     return(
        <div  className={isTodolistShow? 'todolist-toggle': 'todolist-toggle-hidden'}>
 
             <TodoList
-                setIsTodlistShow={setIsTodlistShow}
+                setIsTodolistShow={setIsTodolistShow}
             />
 
              <div className='tasklist-overlay'
-                    onClick={()=>{setIsTodlistShow(pre => !pre)}}
+                    onClick={()=>{setIsTodolistShow(pre => !pre)}}
                  >
             
             </div>

@@ -38,6 +38,12 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
     //project setting 
     const projectTitle = '';
     
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if(event.key ==='Enter'){
+            event.preventDefault();//防止表單默認行為
+            handleAddTask()
+        }
+    }
 
     const handleAddTask = async() => {
         if(!loadingUser){
@@ -142,7 +148,7 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
     }   }
     return (
         <>
-            <input className="tasklist-addTask-input" type="text" placeholder='To do ....' value={title} onChange={(e)=> setTitle(e.target.value)}/>
+            <input className="tasklist-addTask-input" type="text" placeholder='To do ....' value={title} onChange={(e)=> setTitle(e.target.value)} onKeyDown={handleKeyDown}/>
             <button className="tasklist-addTask" onClick={handleAddTask} >Add Task</button>
         </>
     );
