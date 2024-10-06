@@ -17,6 +17,7 @@ const PictureList = [
         url:'/images/google.png'
     }
 ]
+
 function DragDrop(){
     const [board,setBoard] = useState([]);
     const [{ isOver }, drop] = useDrop(() => ({

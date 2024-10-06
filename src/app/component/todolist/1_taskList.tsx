@@ -13,6 +13,7 @@ import { useAuth } from '../auth/authContext';
 import { current } from '@reduxjs/toolkit';
 import { Root } from 'postcss';
 import { fetchProjects } from '@/features/projectsSlice';
+import { fetchCategories } from '@/features/categoriesSlice';
 
 
 
@@ -26,7 +27,9 @@ const TaskList = () => {
     useEffect(()=>{
         if(currentUser){
             dispatch(fetchProjects(currentUser)).then(()=>{
-                dispatch(fetchTasks(currentUser));
+                dispatch(fetchCategories(currentUser)).then(()=> {
+                    dispatch(fetchTasks(currentUser));
+                });
             })
         }
 

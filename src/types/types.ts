@@ -14,6 +14,7 @@ export interface Task {
     projectId: string;
     projectTitle: string;
     createdAt: string;  
+    order: number;
 }
 
 export interface Category {

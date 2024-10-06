@@ -256,12 +256,18 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async(currentUser
                 ...doc.data(),
                 id: doc.id,
                 projectTitle: project.projectTitle,
-            }));
+            })as Task);
             tasks.push(...projectTasks);
         }
         }
     }
     console.log('12341234123412341234', tasks)
+    tasks = tasks.sort((a,b) => {
+        const orderA = a.order ?? new Date(a.createdAt).getTime();
+        const orderB = b.order ?? new Date(b.createdAt).getTime();
+        return orderA - orderB;
+    });
+
     return { tasks, projects };
 
 })

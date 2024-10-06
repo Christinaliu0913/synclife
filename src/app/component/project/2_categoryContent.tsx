@@ -109,7 +109,6 @@ const CategoryContent:React.FC<CategoryContentProps> = ({category,members,update
                 <AddTask
                     categoryId={category.id}
                     setTasks={setTasks}
-                    tasks={tasks}
                     projectId={category.projectId}
                 />
             </div>

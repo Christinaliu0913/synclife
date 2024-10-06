@@ -22,6 +22,7 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
 
     const dispatch:AppDispatch = useDispatch();
     const selectedProject = useSelector((state: RootState) => state.tasks.selectedProject);
+    const tasks = useSelector((state: RootState) => state.tasks.allTasks)
 
     const [title,setTitle] = useState('')
     const taskStatus = 'Unstarted';
@@ -34,7 +35,7 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
     const calendarId = '';
     const projectId = selectedProject? selectedProject:'';
    
-    
+    const order = tasks.length +1 ;
     //project setting 
     const projectTitle = '';
     
@@ -64,7 +65,8 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                             createdAt: new Date().toISOString(),
                             categoryId:'',
                             projectId,
-                            projectTitle
+                            projectTitle,
+                            order
                     };
 
                     dispatch(addTasksAsync({newDocRef, newTask}));
@@ -99,7 +101,8 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                                     createdAt: new Date().toISOString(),
                                     categoryId:currentCatId,
                                     projectId,
-                                    projectTitle
+                                    projectTitle,
+                                    order,
                             }
                             dispatch(addTasksAsync({newDocRef, newTask}));
                             setTitle('');
@@ -131,7 +134,8 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
                                     createdAt: new Date().toISOString(),
                                     categoryId:currentCatId,
                                     projectId,
-                                    projectTitle
+                                    projectTitle,
+                                    order,
                             }
                             dispatch(addTasksAsync({newDocRef, newTask}));
                             dispatch(addCategories({newDocRefCat,newCategory}));

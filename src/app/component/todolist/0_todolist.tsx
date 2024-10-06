@@ -7,7 +7,6 @@ import TaskList from './1_taskList';
 import Image from 'next/image';
 
 import TaskProjectFilter from './1_projectFilter';
-import TaskListTest from './0_atestTaskList';
 
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -49,6 +48,7 @@ const TodoList:React.FC<TodoListProps> = ({setIsTodolistShow}) => {
                     <AddTask
                         currentUser = {currentUser}
                         loadingUser = {loadingUser}
+                        
                     />
                 
          </div>

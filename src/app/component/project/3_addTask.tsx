@@ -12,15 +12,15 @@ import { RootState } from '@/store';
 interface AddTaskProps {
     categoryId: string;
     setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-    tasks: Task[];
     projectId: string;
 }
 
 
-const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) => {
+const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,projectId}) => {
     //store data
     const dispatch:AppDispatch = useDispatch();
-
+    const tasks = useSelector((state:RootState)=> state.tasks.allTasks)
+    
     const {currentUser,loadingUser} = useAuth();
     const taskTitle = '';
     const taskStatus = 'Unstarted';
@@ -30,8 +30,7 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
     const taskDate = new Date().toISOString().slice(0,10);//應該直接設置今天
     const taskOwner: string | null = currentUser?.email ?? null; 
     const calendarId = '';
-    
-    
+    const order = tasks.length + 1 ;
     //新增一個Task
     const handleAddTask = async() => {
         if(!loadingUser){
@@ -50,7 +49,8 @@ const AddTask: React.FC<AddTaskProps> = ({categoryId,setTasks,tasks,projectId}) 
                         createdAt: new Date().toISOString(),
                         categoryId: categoryId,
                         projectTitle:'',
-                        projectId: projectId
+                        projectId: projectId,
+                        order, 
                 }
                 dispatch(addTasksAsync({newDocRef, newTask}))
                 console.log('addNewTask!!!!!!!!!!!!!!',newTask)
