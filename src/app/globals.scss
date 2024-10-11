@@ -369,6 +369,7 @@ body{
   left: 50%;
   background-color: $primary-backgroundColor;
   z-index: 102;
+  min-width: 250px;
   box-shadow: 3px 2px 7px rgba(0, 0, 0, 0.1);
   input{
     border: none;
@@ -739,7 +740,9 @@ body{
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
   }
 }
-
+.fc-button-hover-bg-color{
+  color: $primary-color;
+}
 .fc-toolbar {
   background-color: $primary-backgroundColor;
   height: 60px;

@@ -152,7 +152,7 @@ const AddTask:React.FC<TaskProps> = ({currentUser,loadingUser}) => {
     }   }
     return (
         <>
-            <input className="tasklist-addTask-input" type="text" placeholder='To do ....' value={title} onChange={(e)=> setTitle(e.target.value)} onKeyDown={handleKeyDown}/>
+            <input className="tasklist-addTask-input" type="text" placeholder='Add task ....' value={title} onChange={(e)=> setTitle(e.target.value)} onKeyDown={handleKeyDown}/>
             <button className="tasklist-addTask" onClick={handleAddTask} >Add Task</button>
         </>
     );

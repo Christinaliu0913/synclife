@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, isFulfilled, PayloadAction } from "@reduxjs/toolkit";
 import { db } from '../../firebase'
-import { collection, getDocs, query, where, deleteDoc, doc, updateDoc, setDoc, DocumentReference, DocumentData, getDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, deleteDoc, doc, updateDoc, setDoc, DocumentReference, DocumentData, getDoc, writeBatch } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { Task, Project } from "@/types/types";
 import { tasks } from "googleapis/build/src/apis/tasks";
@@ -279,6 +279,23 @@ export const updateTasksAsync = createAsyncThunk('tasks/updateTask',
     await updateDoc(taskRef, updatedData);
     return { taskId, updatedData };
 })
+export const updateTaskOrderAsync = createAsyncThunk('tasks/updateTaskOrderAsync',
+    async({reorderedTasks, currentUser, selectedProject}:{reorderedTasks:Task[], currentUser: User|null, selectedProject:string|null}) => {
+        if(!currentUser) return 
+        const batch = writeBatch(db);
+
+        reorderedTasks.forEach((task)=> {
+            const taskRef = task.projectId !== ''
+            ?doc(db, `project/${task.projectId}/category/${task.categoryId}/task`,task.id)
+            :doc(db, `noProject/${currentUser.uid}/task`, task.id)
+
+           batch.update(taskRef,{order: task.order})
+        })
+
+        await batch.commit(); //提交所有變更
+        return {reorderedTasks, selectedProject};
+    }
+)
 
 //Async Delete Tasks 
 export const deleteTasksAsync = createAsyncThunk('tasks/deleteTask', 
@@ -419,6 +436,26 @@ const tasksSlice = createSlice({
                 const updatedTask = action.payload as Task;
                 state.allTasks.push(updatedTask);
                 state.tasks.push(updatedTask);
+            })
+            // Update task order
+            .addCase(updateTaskOrderAsync.fulfilled, (state,action)=> {
+                if(!action.payload) return;
+                const { reorderedTasks, selectedProject } = action.payload;
+                
+                state.allTasks = reorderedTasks;
+
+                //根據selectedProject來更新tasks
+
+                if(selectedProject === ''){//沒有filter projects的時候顯示所又任務
+                    state.tasks = reorderedTasks;
+                }else{
+                    state.tasks = state.allTasks.filter(tasks => 
+                        tasks.projectId === selectedProject
+                    )
+                }
+                
+                state.loading = false;
+
             })
             
     }

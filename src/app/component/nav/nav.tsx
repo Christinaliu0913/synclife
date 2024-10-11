@@ -18,7 +18,11 @@ const Navigation = () => {
     }
     const [tasks,setTasks] = useState<Task[]|[]>([])
     
-    
+    const handleSideToggleToDoList = () => {
+        setIsTodolistShow(!isTodolistShow);
+        setIsSidebarVisible(!isSidebarVisible);
+
+    }
     return(
         <>
             <div className='sidebar-phone'>
@@ -46,7 +50,7 @@ const Navigation = () => {
                         <li>
                             <span  >
                                 <Image src="/images/check-contained.png" alt="Description" width={20} height={20} className='menu-listImg'/>
-                                <a onClick={()=>setIsTodolistShow(!isTodolistShow)}>To do list</a>
+                                <a onClick={handleSideToggleToDoList}>To do list</a>
                             </span> 
                         </li>
                         <li>

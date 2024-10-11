@@ -6,6 +6,7 @@ $hover-color: #F9F9F9;
 $primary-backgroundColor: #FFF9F4;
 $grey: #5B5B5B;
 $greyLight: #C4C4C4;
+$wordGrey: #8a8a8a;
 
 
 .body{
@@ -47,13 +48,17 @@ z-index: 24;
     input{
         border: none;
         border-radius: 5px;
-        margin: 8px;
+        margin: 3px;
         font-size: 12px;
+        height: 25px;
         text-indent: 5px;
-        box-shadow: 0px 2px 5px rgba(63, 63, 63, 0.1);
+        width: 115px;
     }
     button{
         border: none;
+    }
+    hr{
+        border: 0.5px solid #e5e5e5;
     }
 }
 
@@ -78,24 +83,110 @@ z-index: 24;
         }
     }
 }
+.list-task-container{
+    width: 350px;
+}
 .list-task{
     display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(63, 63, 63, 0.1);
+    margin: 3px;
+    width: 100%;
+    z-index: 100;
+    &:hover{
+        background-color: $hover-color;
+    }
+}
+.list-task-draggable{
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 5px;
+}
+.list-task-draggableLine{
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    margin: 5px;
+    background-color: $primary-color;
+    border-radius: 25px;
+    box-shadow: -2px 0px 5px $primary-color;
+}.above{
+    bottom: -7px;
+    left: -6px;
+}
+.below{
+    bottom: -7px;
+    left: -6px;
+}
+
+.list-taskMain{
+    flex:auto;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.list-taskMain-blank{
+    flex: auto;
+    width: 80px;
+    height: 20px;
+}
+.list-taskMain-date{
+    flex: auto;
+    width: 70px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: $greyLight;
+    font-weight: 400;
+    border-radius: 20px;
+    // border: 0.5px solid $greyLight;
+    background-color: #fff;
+    cursor: pointer;
+    &:hover{
+        background-color: $hover-color;
+    }
+}
+.list-description{
+    font-size: 10px;
+    color: $wordGrey;
+    position: relative;
+    left: 50px;
+    top: -5px;
+    height: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.list-taskDetail{
+    display: flex;
+    margin-left: 10px;
+    justify-content: start;
+    flex-direction: column;
 }
 
 // -----------checkbox---------------
 .tasklist-check-container {
     display: flex;
     align-items: center;
+    margin-left: 10px;
+    
 }
 
 .tasklist-check {
     display: none; /* 隐藏默认的复选框 */
+    
 }
 
 .tasklist-check + label {
     display: inline-block; 
-    width: 20px; 
-    height: 20px; 
+    width: 15px; 
+    height: 15px; 
     border: 2px solid #ccc;
     border-radius: 50%;
     background: #fff;
@@ -112,13 +203,13 @@ z-index: 24;
 .tasklist-check:checked + label:after {
     content: '';
     display: block;
-    width: 6px;
-    height: 12px;
+    width: 4px;
+    height: 8px;
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
     position: absolute;
-    left: 6px;
+    left: 4px;
     top: 1px;
 }
 //taskList の中身-----------
@@ -141,7 +232,6 @@ z-index: 24;
 
 .tasklist-title-container{
     display: flex;
-
 }
 .tasklist-title{
     width: 80px;
@@ -151,7 +241,8 @@ z-index: 24;
 .tasklist-projectSelect{
     cursor: pointer;
     border: none;
-    width: 70px;
+    width:80px;
+    height: 25px;
     background-color: #ffffff00;
     &:hover{
         background-color: $minor-fontColor;
@@ -160,7 +251,9 @@ z-index: 24;
 .tasklist-projectImg{
     margin-right: 2px;
     position: relative;
-    top: 12px
+}
+.tasklist-date-container{
+    margin-left: 28px
 }
 .tasklist-date{
     width:auto;
@@ -171,15 +264,16 @@ z-index: 24;
 }
 
 .tasklist-delete{
-    position: relative;
-    top: 10px;
-    left: -8px;
-    width: 10px;
+    position: absolute;
+    right: 1px;
+    width: 25px;
     height: 25px;
     font-weight: bold;
     color: $greyLight;
     transition: all 0.2s ease;
+    display: flex;
     align-items: center;
+    justify-content: center;
     background-color: #ffffff00;
     cursor: pointer;
     &:hover{
@@ -208,6 +302,51 @@ z-index: 24;
     }
 }
 
+
+.tasklis-description-container{
+    margin-left: 35px;
+    display: flex;
+    position: relative;
+}
+.tasklist-description-Img{
+  top: 0px;
+}
+.tasklist-description{
+    font-size: 12px;
+    overflow: hidden;
+    resize: none;
+    line-height: 1.5;
+    transition: height 0.2s ease;
+    height: 30px;
+    width: 250px;
+    border: none;
+    border-radius: 5px;
+    margin: 3px;
+    font-size: 12px;
+    text-indent: 5px;
+}
+
+.tasklist-description.collapsed{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 30px;
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    &:hover{
+        width: 270px;
+        max-height: 80px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+}
+.tasklist-description.expand{
+    white-space: normal;
+    overflow: auto;
+    width: 250px;
+    max-height: 150px;
+}
 .tasklist-overlay{
     position:fixed;
     top: 0;
@@ -242,12 +381,16 @@ z-index: 24;
     
 }
 
+
 .tasklist-addTask-input{
     background: #fff;
     height: 27px;
     width: 120px;
     height: 30px;
     border-radius: 5px;
+}
+.tasklist-addTask-input::placeholder{
+    color: $greyLight;
 }
 
 .todolist-toggle{

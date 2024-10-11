@@ -83,30 +83,17 @@ const TaskListDate:React.FC<TaskListDateProps> = ({task,onUpdate,onDelete}) => {
     }
     return (
         <>
-
-            <input 
-                className="tasklist-date"
-                type="date"  
-                value={date} 
-                onChange={(e) => setDate(e.target.value)}
-                onBlur={()=>handleBlur({taskDate: date})}
-            />
-            <div
-                className="tasklist-delete"
-                onClick={()=> setDeleteVisible(pre=> !pre)}
-                
-            >⋮
-            {isDeleteVisible?(
-                <>
-                    <div className="tasklist-delete-block" onClick={handleDeleteTask}>
-                        <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
-                    </div>
-                    <div className="tasklist-overlay"></div>
-                </>
-                
-            )
-            :<></>}
+            <div className="tasklist-date-container">
+                <input 
+                    className="tasklist-date"
+                    type="date"  
+                    value={date} 
+                    onChange={(e) => setDate(e.target.value)}
+                    onBlur={()=>handleBlur({taskDate: date})}
+                />
             </div>
+            
+            
         </>
     )
 }

@@ -11,6 +11,7 @@ import TaskProjectFilter from './1_projectFilter';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import dynamic from 'next/dynamic';
+import TaskListTest from './0_atestTaskList';
 
 
 interface TodoListProps{
@@ -38,8 +39,7 @@ const TodoList:React.FC<TodoListProps> = ({setIsTodolistShow}) => {
                 {/* task List*/}
                     <DndProviderNoSSR backend={HTML5Backend}>
                         <div >
-                            <TaskList/>
-                            
+                            <TaskListTest/>
                         </div>
                     </DndProviderNoSSR>
                 
