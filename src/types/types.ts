@@ -38,6 +38,7 @@ export interface Project {
     projectDateEnd: string;
     projectOwner: string | undefined;
     createdAt: string;
+    projectOrder: number|null;
 }
 
 export interface Event {

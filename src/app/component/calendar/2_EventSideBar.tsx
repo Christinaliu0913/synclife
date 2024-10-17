@@ -12,7 +12,7 @@ import Cookies from 'js-cookie';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { AppDispatch } from '@/store'
-import { fetchProjects } from '@/features/projectsSlice';
+import { addProjects, fetchProjects } from '@/features/projectsSlice';
 import { settingGoogleEvents } from './gapi/2_settingGoogleEvents';
 import { gapi } from 'gapi-script';
 import { setAddEvent, setGoogleEvents } from '@/features/eventsSlice';
@@ -371,6 +371,35 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             document.removeEventListener('touchend', handleMouseUp);
         };
     }, [isDragging]);
+
+
+    //create Project
+    const [createProject, setCreateProject] = useState('');
+
+    const handleCreateNewProject = () => {
+        if(!loadingUser){
+            if(currentUser){
+                const newDocRef = doc(collection(db, 'project'));
+                const newProject:Project = {
+                    id: newDocRef.id,
+                    uid:currentUser.uid,
+                    projectTitle: createProject,
+                    projectColor: '',
+                    projectStatus:'Unstarted',
+                    projectMember: currentUser && currentUser.email ? [currentUser.email] : [],
+                    projectDateStart: new Date().toISOString(),
+                    projectDateEnd: '',
+                    projectOwner:currentUser?.email ?? undefined,
+                    createdAt: new Date().toISOString(),
+                    projectOrder:null,
+                }
+                
+                dispatch(addProjects({newDocRef, newProject}));
+            }
+        }
+        setShowCreateNewProject(false);
+        return;
+    }
     return (
         <>
         {/* 點擊才會show */}
@@ -526,8 +555,8 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                                         <div>
                                             Create new project
                                         </div>
-                                        <input type="text" name="" id="" placeholder='Project name'/>
-                                        <div className='createProject-create'>Create project</div>
+                                        <input type="text" name="" id="" value={createProject} onChange={(e)=>setCreateProject(e.target.value)} placeholder='Project name'/>
+                                        <div className='createProject-create' onClick={handleCreateNewProject}>Create project</div>
                                         <button onClick={onCloseProjectCreate} className='createProject-close'>x</button>
                                     </div>
                                 </div>
@@ -700,7 +729,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                             {showCreateNewProject &&
                                 (
                                     <>
-                                        <div className='sidebar-project-createProject'>
+                                        <div className='sidebar-project-createProject-phone'>
                                             <div className='sidebar-project-createProject-box'>
                                                 <div>
                                                     Create new project

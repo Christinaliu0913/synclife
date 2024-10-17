@@ -22,6 +22,7 @@ const AddProject = () => {
     const projectDateEnd = '';
     const projectOwner: string | undefined = currentUser?.email ?? undefined;
     const projectColor =  '';
+    const projectOrder = null;
 
 
 
@@ -40,7 +41,8 @@ const AddProject = () => {
                     projectDateStart,
                     projectDateEnd,
                     projectOwner,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    projectOrder,
                 }
                 
                 dispatch(addProjects({newDocRef, newProject}));
