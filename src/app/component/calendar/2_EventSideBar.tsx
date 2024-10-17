@@ -291,8 +291,86 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     //Adding New project
     const handleAddNewProject = () => {
         setShowCreateNewProject(!showCreateNewProject)
+    }
+
+    //RWD滑動
+    const [isDragging, setIsDragging] = useState(false)
+    const [offsetY, setOffsetY] = useState(0);//滑鼠與元素頂部的位置的gap
+    const [initialY, setInitialY] =useState(0);//元素初始位置
+    const [expand, setExpand] = useState(false);//控制展開視窗
+    const THRESHOLD = 10;//設置滑動閾值
+
+    //拖動中
+    const handleMouseMove = (e:any) => {
+        const sidebar = document.querySelector('.addEvent-sidebar-phone') as HTMLElement;
+        if(!sidebar) return;
+        const newY = e.clientY - offsetY
+        if(isDragging && !expand){//未展開
+            
+            if(initialY - e.clientY > THRESHOLD){
+                sidebar.style.height = '80%';
+                sidebar.style.transform = `translateY(0)`;//固定
+                setExpand(true);
+            }
+            else{sidebar.style.transform =`translateY(${newY-initialY}px)`}
+            
+            console.log('work', newY)
+        }
+        
 
     }
+    const handlePutDown = (e:any) => {
+        const sidebar = document.querySelector('.addEvent-sidebar-phone') as HTMLElement;
+        if(expand){
+            sidebar.style.height = 'auto';
+            sidebar.style.transform =`translateY(0)`;
+            setExpand(false);
+        }else{
+            sidebar.style.height = '80%';
+            sidebar.style.transform = `translateY(0)`;//固定
+            setExpand(true);
+        }
+    }
+    const handleMouseUp = (e:any) => {
+        setIsDragging(false);
+        //解除禁止選擇
+        document.body.style.userSelect = 'auto';
+    }
+
+    //開始拖動
+    const handleMouseDown = (e:any) => {
+        const sidebar = document.querySelector('.addEvent-sidebar-phone') as HTMLElement;
+            if(sidebar){
+                const rect = sidebar.getBoundingClientRect();
+                setIsDragging(true);
+                setOffsetY(e.clientY - rect.top);//偏移量
+                setInitialY(rect.top)
+                console.log('drag',rect.top)
+                //禁止選擇
+                document.body.style.userSelect = 'none';
+            }
+        
+    }
+    //監聽花束的事件
+    useEffect(() => {
+        if (isDragging) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('touchmove', handleMouseMove);
+            document.addEventListener('touchend', handleMouseUp);
+        } else {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('touchmove', handleMouseMove);
+            document.removeEventListener('touchend', handleMouseUp);
+        }
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('touchmove', handleMouseMove);
+            document.removeEventListener('touchend', handleMouseUp);
+        };
+    }, [isDragging]);
     return (
         <>
         {/* 點擊才會show */}
@@ -483,6 +561,190 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
         </div>
 
         )}
+        {/* 手機調整 --------------------------------------*/}
+        {sideBarVisible && (<>
+            <div className={`addEvent-sidebar-phone`}  onMouseMove={handleMouseMove} onTouchMove={handleMouseMove} onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
+            
+                <div className='addEvent-sidebar-container-phone'>
+                    {/* 表單 */}
+                    
+                    
+                    <div className='sidebar-edit-phone'>
+                        <button  className='sidebar-cancel' onClick={onClose}>Cancel</button>
+                        <div></div>
+                        <div className='sidebar-toggleBar-container' >
+                            <div className={`sidebar-toggleBar ${isDragging? 'dragging': ''}`} onMouseDown={handleMouseDown} onTouchStart={handleMouseDown} onClick={handlePutDown}></div>
+                        </div>
+                        <div></div>
+                        <button  className='sidebar-save'onClick={handleSave}  >Save</button>
+
+                    </div>
+                    
+                    <div className='sidebar-title-phone'>
+                        <label htmlFor="title"></label>
+                        <input  type="text" id='title' value={title} onChange={(e)=>setTitle(e.target.value)} placeholder='Title'/>
+                        <button className="sidebar-delete1"onClick={()=>{setIsEventDeleteVisible(prev=> !prev)}}>
+                        ⋮
+                        {isEventDeleteVisible?
+                        (<>
+                            <div className="sidebar-delete-block" onClick={Ondelete}>
+                                <Image  src="/images/delete.svg" alt="project delete" width={20} height={20}/>
+                            </div>
+                            {/* <div className="sidebar-delete-overlay" onClick={()=>{setIsEventDeleteVisible(false)}}></div> */}
+                        </>):
+                        <></>
+                        }
+                    </button>
+                    </div>
+                    
+                
+                    <div className='sidebar-date-phone'>
+                        {/* <label htmlFor="start"></label> */}
+                        <input type={checkAllDay ? "date" : "datetime-local"} id='start' value={start} onChange={(e)=>setStart(e.target.value)} placeholder='start time'/>
+                        <label htmlFor="end">~</label>
+                        <input type={checkAllDay ? "date" : "datetime-local"} id='end' value={end} onChange={(e)=>setEnd(e.target.value)} placeholder='end time' />
+                    </div>
+
+                
+
+                    <div className='sidebar-allday-phone'>
+                        <label htmlFor="allDay">All Day</label>
+                        <input type="checkbox" id='allDay' checked={checkAllDay} onChange={handleAllDayChange} placeholder='end time' />
+                    </div>
+                        
+                    
+
+                    <div style={{display:"none"}} className='sidebar-project-phone'>
+                        
+                        <Image className='sidebar-projectImg' src="/images/Folder_light.svg" alt="task project" width={25} height={25}/>
+                        <label htmlFor="project">Project</label>
+                        <select id="project" 
+                                value={optionProject} 
+                                onChange={(e)=>{
+                                    if(e.target.value === '0'){
+                                        setOptionProject('')
+                                        setNewProject(null)
+                                        
+                                    }
+                                    else{
+                                        setNewProject(e.target.value)
+                                        setOptionProject(e.target.value)
+                                        console.log('changeck',optionProject)
+                                    }
+                                    console.log('changeck',optionProject)
+                                    console.log('finalck',optionProject)
+                                }}
+                                onClick={()=> setShowNewProject(!showNewProject)}
+                                >
+                            <option value="0">None</option>
+                            {Array.isArray(projects) ?
+                                (projects?.map(project => (
+                                    <ProjectOption
+                                        key={project.id}
+                                        project={project}
+                                    />   )
+                                ))
+                                :
+                                (
+                                    <>
+                                    <option >no projects</option>
+                                    </>
+                                )
+                            
+                            }
+
+                            
+                            
+                        </select>
+                    
+                        
+                        
+                    </div>
+                    {expand?
+                    <>
+                        <div className='sidebar-project-phone'>
+                        
+                            <Image className='sidebar-projectImg' src="/images/Folder_light.svg" alt="task project" width={25} height={25}/>
+                            <label htmlFor="project">Project</label>
+                            <div className='sidebar-project-select-phone' onClick={()=> setShowProjectSelect(!showProjectSelect)}>
+                                {optionProjectTitle? optionProjectTitle : 'Add in project' }
+                                <Image className='sidebar-project-select-toggle' src="/images/toggle.svg" alt="task project" width={15} height={15}/>
+                                {showProjectSelect && 
+                                    (
+                                        <>
+                                            <div className='sidebar-overlay'></div>
+                                            <div className='sidebar-project-selectItems-phone'>
+                                                <button onClick={()=> handleAddNewProject()}><Image src="/images/add.svg" alt="task project" width={15} height={15}/>Add new project</button>
+                                                <div  className="sidebar-project-selectItem" onClick={() => handleOptionClick(null)}> no project </div>
+                                                {Array.isArray(projects) ?
+                                                    (projects?.map(project => (
+                                                        <div key={project.id} className="sidebar-project-selectItem" onClick={() => handleOptionClick(project) } ><p>{project.projectTitle}</p></div> )
+                                                    ))
+                                                    :
+                                                    (
+                                                        <>
+                                                        <div className="sidebar-project-selectItem">no projects</div>
+                                                        </>
+                                                    )
+                                                
+                                                }
+                                                
+                                            </div>   
+                                            
+                                        </>
+                                    )
+                                }
+                            
+                            </div>
+                            
+                            {showCreateNewProject &&
+                                (
+                                    <>
+                                        <div className='sidebar-project-createProject'>
+                                            <div className='sidebar-project-createProject-box'>
+                                                <div>
+                                                    Create new project
+                                                </div>
+                                                <input type="text" name="" id="" placeholder='Project name'/>
+                                                <div className='createProject-create'>Create project</div>
+                                                <button onClick={onCloseProjectCreate} className='createProject-close'>x</button>
+                                            </div>
+                                        </div>
+                                        <div onClick={onCloseProjectCreate} className='sidebar-overlay'>
+
+                                        </div>
+                                    </>
+                                    
+                                )
+                            }
+                            
+                        </div>
+
+                        <div className='sidebar-note-phone' >
+                            <input placeholder='Note' type="text" name="" id="description" value={description} onChange={(e)=> setDescription(e.target.value) }/>
+                        </div>
+                    </>:
+                    <></>
+                    }
+                    
+
+                    
+                    {/*  */}
+                    
+                    {selectedEventId &&(
+                        <div
+                            className='sidebar-delete' 
+                            onClick={Ondelete}>
+                            <Image className='sidebar-delete' src="/images/delete.svg" alt="task project" width={20} height={20}/>
+                        </div>
+                    )}
+                </div>
+            
+            </div>
+        
+        
+        
+        </>)}
         
         </>
     )

@@ -37,8 +37,45 @@ $greyLight: #C4C4C4;
   .todolist-toggle{
     left: 0px !important;
   }
+  .fc-toolbar-chunk{
+    font-size: 15px!important;
+  }
+  .fc-col-header-cell-cushion {
+    font-size: 16px !important ;
+  }
+  
 }
+@media (max-width: 500px) {
+  .fc{
+    background-color: $primary-backgroundColor;
+  }
+  .fc-header-toolbar fc-toolbar fc-toolbar-ltr{
+    margin: 5px !important;
+  }
+  .fc-toolbar-chunk:nth-child(1){
+   flex-basis: 100% !important;
+  }
+  .fc-toolbar-chunk:nth-child(2),
+  .fc-toolbar-chunk:nth-child(3){
+   flex-basis: 35% !important;
+   margin: 9px !important;
+  }
+  
+  .fc-view-harness.fc-view-harness-active {
+    height: 500px !important; 
+  }
+ 
+ }
 
+ @media (max-width: 400px) {
+  .fc-col-header-cell-cushion {
+    font-size: 12px !important ;
+  }
+  .fc-toolbar-chunk:nth-child(3){
+    flex-basis: 35% !important;
+    margin: 3px !important;
+   }
+ }
 .pages-container {
     display: flex;
     

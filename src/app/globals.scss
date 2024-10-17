@@ -9,6 +9,20 @@ $greyLight: #C4C4C4;
 $yellow: #E6D7B2;
 $yellow-hovor: #FFE5A3;
 
+@media (max-width: 768px) {
+  .addEvent-sidebar-phone{
+    display: flex !important;
+  }
+  .addEvent-sidebar{
+    display: none !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .sidebar-date-phone{
+    flex-wrap: wrap;
+  }
+}
 @keyframes spin{
   from {
     transform: rotate(0deg);
@@ -375,16 +389,25 @@ body{
     border: none;
   }
 }
-// .addEvent-sidebar{
-//   width: 300px;
-//   display: none;
-//   position: absolute;
-//   &.show{
-//     display: block;
-//     transform: translateX(0);
-//   }
-
-// }
+.addEvent-sidebar-phone{
+  display: none;
+  justify-content: center;
+  border-radius: 7%;
+  padding: 10px;
+  position: fixed;
+  bottom: 0px;
+  background-color: $primary-backgroundColor;
+  z-index: 102;
+  max-height: 90%;
+  transform: translateY(0); 
+  transition: transform 0.2s ease;
+  // height: 90%;
+  width: 98%;
+  box-shadow: 3px 2px 15px rgba(0, 0, 0, 0.2);
+  input{
+    border: none;
+  }
+}
 .sidebar-overlay{
   position:fixed;
   top: 0;
@@ -404,11 +427,59 @@ body{
   }
 
 }
+.addEvent-sidebar-container-phone{
+  position: relative;
+  width: 100%;
+  padding: 0px 20px;
+  z-index: 102;
+  div{
+    margin-top: 5px;
+    margin-left: 5px;
+  }
+
+}
+.sidebar-toggleBar-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .sidebar-toggleBar{
+    width: 40px;
+    height: 5px;
+    background-color: $greyLight;
+    box-shadow: #5B5B5B;
+    border-radius: 10px;
+    cursor:grab;
+  }
+  .sidebar-toggleBar.dragging{
+    cursor: grabbing;
+  }
+}
+
+
+.sidebar-edit-phone{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin-bottom: 10px;
+  .sidebar-cancel{
+    background: none;
+    box-shadow: none;
+    color:  $greyLight;
+    font-size: 16px;
+  }
+  .sidebar-save{
+    background: none;
+    box-shadow: none;
+    font-size: 16px;
+    color:  $primary-color;
+  }
+}
+
 
 .sidebar-title{
   display: flex;
   justify-content: flex-end;
-  
   border-radius: 5px;
   background-color: #ffffff00;
   font-weight: bolder;
@@ -417,6 +488,26 @@ body{
     height: 30px;
     width: 100%;
     font-size: 16px;
+  }
+}
+.sidebar-title-phone{
+  display: flex;
+  justify-content: flex-end;
+  border-radius: 5px;
+  background-color: #ffffff00;
+  font-weight: bolder;
+  transition: all 0.2s ease;
+  text-indent: 10px;
+  margin: 20px 0px;
+  input{
+    height: 50px;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+  input::placeholder{
+    color: $greyLight;
+    text-indent: 10px;
   }
 }
 .sidebar-delete1{
@@ -471,6 +562,7 @@ body{
   height: 30px;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   label{
     color: $grey;
     font-size: 14px;
@@ -479,8 +571,28 @@ body{
   }
   input{
     width: 15px;
-    height: 15px;
+    height: 30px;
     margin: 3px;
+
+  }
+}
+.sidebar-allday-phone{
+  height: 30px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  label{
+    color: $grey;
+    font-size: 16px;
+    margin-top: 2px;
+    padding: 0px;
+
+  }
+  input{
+    width: 15px;
+    height: 30px;
+    margin: 3px;
+
   }
 }
 
@@ -499,6 +611,27 @@ body{
  
   }
 }
+.sidebar-date-phone{
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0px;
+  label{
+    flex:auto;
+    text-align: center;
+    width: 100px;
+  }
+  input{
+    flex:auto;
+    height: 50px;
+    width: 100%;
+    border-radius: 10px;
+  }
+  input::-webkit-input-placeholder{
+    color: $greyLight;
+  }
+}
 .sidebar-note{
   input{
     width: 100%;
@@ -508,12 +641,41 @@ body{
     
   }
 }
+.sidebar-note-phone{
+  margin:10px 5px;
+  input{
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 16px;
+    text-indent: 10px;
+  }
+  input::placeholder{
+    color: $greyLight;
+    text-indent: 10px;
+  }
+}
+
 
 .sidebar-project{
   display: flex;
   align-items: center;
   gap: 5px;
   
+  select{
+    border: none;
+    height: 30px;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 5px;
+    
+  }
+}
+.sidebar-project-phone{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 10px 5px;
   select{
     border: none;
     height: 30px;
@@ -536,6 +698,19 @@ body{
   cursor: pointer;
   
 }
+.sidebar-project-select-phone{
+  text-indent: 5px;
+  position: relative;
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  
+}
 .sidebar-project-select-toggle{
   position: absolute;
   right: 5px;
@@ -548,6 +723,31 @@ body{
   background-color: #fff;
   position:absolute;
   top: 28px;
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  button{
+    border: none;
+    background-color: #fff;
+    font-size: 14px;
+    color: $greyLight;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap:5px;
+    width: 100%;
+    margin: 5px;
+    border-radius: 5px;
+    &:hover{
+      background-color: $hover-color;
+    }
+  }
+}
+.sidebar-project-selectItems-phone{
+  width: 100%;
+  border-radius: 5px;
+  background-color: #fff;
+  position:absolute;
+  bottom: 50px;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
   z-index: 100;
   button{
@@ -762,6 +962,10 @@ body{
     margin-top: 2px;
   }
   
+}
+//上方日期選擇三元素
+.fc .fc-toolbar {
+  flex-wrap: wrap;
 }
 //最上面那個邊
 .fc .fc-scrollgrid {
