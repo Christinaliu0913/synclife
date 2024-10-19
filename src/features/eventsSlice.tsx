@@ -254,6 +254,18 @@ const eventsSlice = createSlice({
             .addCase(deleteLocalEvent.fulfilled, (state, action) => {
                 state.events =state.events.filter(event => event.id !== action.payload )
             })
+            .addCase(updateLocalEvent.pending,(state)=>{
+                state.loading = true;
+            })
+            .addCase(updateLocalEvent.fulfilled,(state, action) => {
+                const {eventId, updatedlocalEventData} = action.payload;
+                state.events = state.events.map(event  => {
+                    if(event.id === eventId){
+                        return { ...event, ...updatedlocalEventData}
+                    }
+                    return event;
+                })
+            })
     }
 })
 

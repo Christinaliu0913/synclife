@@ -99,7 +99,9 @@ const CalendarComponent = () =>{
 
     //設置event的Render內容
     const renderEventContent = (eventInfo:any) =>{
-        
+        const eventProjectId = eventInfo.event.extendedProps.projectId;
+        const eventProject = projects.find(pj =>  pj.id === eventProjectId)
+        const eventProjectTitle = eventProject?.projectTitle;
         if(eventInfo.event.extendedProps.taskType ==='task'){
             return (
                 <>
@@ -112,7 +114,7 @@ const CalendarComponent = () =>{
                             onChange={()=>handleTaskCheck(eventInfo.event.extendedProps.taskId,eventInfo.event.extendedProps.completed,eventInfo.event.extendedProps.projectId)}
                         />
                         <div style={{overflow:'auto',overflowX:'hidden',overflowY:'hidden'}}>
-                            <span style={{width:'auto',position:'relative',color:'#6E4D31',textAlign:'right'}}>{eventInfo.event.extendedProps.projectTitle}</span>
+                            <span style={{width:'auto',position:'relative',color:'#6E4D31',textAlign:'right'}}>{eventProjectTitle}</span>
                             <span style={{marginRight:'6px'}}> {eventInfo.event.title}  </span>
                             
                         </div>
@@ -133,7 +135,7 @@ const CalendarComponent = () =>{
                     (<></>)
                 }
                 
-                <i>{eventInfo.event.extendedProps.projectTitle}</i>
+                <i>{eventProjectTitle}</i>
             </div> 
             </>
             
@@ -212,7 +214,7 @@ const CalendarComponent = () =>{
         //格式化時間
         const formattedStart = formatDateTime(event.startStr, event.allDay);
         const formattedEnd = formatDateTime(event.endStr,event.allDay);
-
+        console.log('start',event.startStr,'end', event.endStr)
         
         setSelectedStartedTime(formattedStart);
         setSelectedEndTime(formattedEnd);

@@ -57,6 +57,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     Ondelete
     }) => {
 
+    
     //所選到的event資料
     const [calendarId, setCalendarId] = useState('')
     const [title, setTitle] = useState('');
@@ -89,8 +90,9 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     const [showProjectSelect, setShowProjectSelect] = useState(false)
     const [showNewProject, setShowNewProject] = useState(false)
     const [showCreateNewProject, setShowCreateNewProject] = useState(false)
-    console.log('確認selected日曆',selectedEvent)
-    
+    console.log('確認selected日曆haha',selectedEvent)
+    console.log('select_________end',selectedEndTime)
+    console.log('op',optionProject,'new',newProject)
     //----------------store data目前使用者的project---------------------
     const dispatch:AppDispatch = useDispatch();
     // task
@@ -163,7 +165,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     checkAllDay, 
                     calendar: calendar || 'default', 
                     description, 
-                    projectId: projectId, 
+                    projectId: newProject, 
                     id: selectedEventId? selectedEventId : null
                 };
 
@@ -180,19 +182,26 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             }
             //localEvent
             else{
+                const event = selectedEvent.event;
                 const eventId = selectedEventId;
                 const eventDef = doc(db, `event/${currentUser?.uid}/event`,selectedEventId)
+                const start = selectedEvent.startStr;
+                const end = selectedEvent.endStr;
+                const allDay = selectedEvent.allDay;
                 const updatedlocalEventData = {
-                    title: title || '',
-                    start: start,
-                    end: end,
-                    checkAllDay: checkAllDay,
-                    description: description || '',
+                    title,
+                    start,
+                    end,
+                    checkAllDay: allDay,
+                    description: selectedEvent.extendedProps.description ||'',
                     taskStatus: 'Unstarted',
                     projectTitle: '',
-                    projectId: newProject || '',
-                    createdAt: new Date().toISOString()
+                    projectId: newProject? newProject: selectedProject||'',
+                    createdAt: new Date().toISOString(),
+                    taskType: 'event',
+                    id: selectedEvent.id,
                 }
+                console.log('這裡這裡',updatedlocalEventData)
                 try{
                     dispatch(updateLocalEvent({eventDef,updatedlocalEventData,eventId}))
                     
@@ -200,6 +209,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     console.log('更新localEvent時出錯????',error);
                 }
             }
+            onClose();
 
             
 
@@ -260,6 +270,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                 }else{
                     console.log('without google calendar auth, save in local');
                     const newEventRef = doc(collection(db, `event/${currentUser?.uid}/event`))
+                    console.log('ckckckckckckckc',start,end)
                     await setDoc(newEventRef,{
                         title: title || '',
                         start: start,
@@ -268,7 +279,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                         description: description || '',
                         taskStatus: 'Unstarted',
                         projectTitle: '',
-                        projectId: newProject || '',
+                        projectId: optionProject || '',
                         createdAt: new Date().toISOString()
                     })
                     const localEvent = [{
@@ -279,11 +290,12 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                         description: description || '',
                         taskStatus: 'Unstarted',
                         projectTitle: projectTitle||'',
-                        projectId: newProject || '',
+                        projectId: newProject? newProject : '',
                         createdAt: new Date().toISOString(),
                         taskType: 'event',
                         id: newEventRef.id,
                     }];
+                    console.log('save',localEvent)
                     dispatch(setAddEvent(localEvent));
     
                 }
@@ -333,6 +345,7 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
     setOptionCalendar('');
     setNewProject('');
     setOptionProject('');
+    setOptionProjectTitle('');
     }
    
     //adding or change project
