@@ -1,7 +1,7 @@
-"use client";
 
-
-import { setGoogleEvents, setLoading } from "@/features/eventsSlice";
+import { setDeleteGoogleEvent, setGoogleEvents, setLoading } from "@/features/eventsSlice";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 
 
@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 export const deleteGoogleEvent = async({eventId,dispatch}:{eventId:string,dispatch:any}) => {
 
     dispatch(setLoading(true));
-
+   
     try{
         const { gapi } = await import('gapi-script');
 
@@ -17,8 +17,9 @@ export const deleteGoogleEvent = async({eventId,dispatch}:{eventId:string,dispat
             calendarId: 'primary',
             eventId: eventId,
         });
-        dispatch(setGoogleEvents((events:any) => events.filter((event:any) => event.id !== eventId)));
-
+        dispatch(setDeleteGoogleEvent(eventId));
+        
+        console.log('刪除了！')
     }catch(error){
         console.error('刪除google日曆事件時出錯',error)
     }finally{

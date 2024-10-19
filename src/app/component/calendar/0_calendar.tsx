@@ -20,6 +20,7 @@ import EventSideBar from './2_EventSideBar';
 import { fetchProjects } from '@/features/projectsSlice';
 import { useFetchGoogleEvents } from './gapi/useFetchGoogleEvent';
 import addEventToGoogleCalendar from './2_addEventToGoogleCalendaar';
+import { deleteGoogleEvent } from './gapi/deleteGoogleEvent';
 
 
 
@@ -206,7 +207,7 @@ const CalendarComponent = () =>{
         setSelectedEventId(event.id)
         setSelectedEventType(event.extendedProps.taskType);
         
-
+        console.log('ididid',selectedEventId)
         setAllDay(event.allDay);
         //格式化時間
         const formattedStart = formatDateTime(event.startStr, event.allDay);
@@ -252,7 +253,7 @@ const CalendarComponent = () =>{
             description: event.extendedProps.description ||'',
             taskStatus: 'Unstarted',
             projectTitle: '',
-            projectId: event.extendedProps.projec || '',
+            projectId: event.extendedProps.projectId || '',
             createdAt: new Date().toISOString(),
             taskType: 'event',
             id: event.id,
@@ -299,7 +300,7 @@ const CalendarComponent = () =>{
     //刪除event
     const handleDeleteEvent= async(eventId:string,selectedEventType:string) =>{
         if(selectedEventType === 'googleEvent'){
-            // dispatch(deleteGoogleEvent({eventId}));
+            deleteGoogleEvent({eventId, dispatch})
             setsideBarVisible(false);
    
         }
@@ -307,6 +308,7 @@ const CalendarComponent = () =>{
             if(currentUser){
                 const eventDef = doc(db, `event/${currentUser.uid}/event/${eventId}`);
                 dispatch(deleteLocalEvent({eventDef, eventId}))
+                setsideBarVisible(false);
             }
         }else{
             console.log('Task不可變動',event);
@@ -356,7 +358,7 @@ const CalendarComponent = () =>{
                         calendarType: event.calendarType,
                         taskType:event.taskType,
                         color:event.color,
-
+                        description:event.description
                     }
                 }
                 else{

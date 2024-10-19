@@ -13,6 +13,7 @@ import { deleteTasksAsync,fetchTasks } from "./tasksSlice";
 import { useAuth } from "@/app/component/auth/authContext";
 import { fetchProjects } from "./projectsSlice";
 import { Event } from "@/types/types";
+import { deleteGoogleEvent } from "@/app/component/calendar/gapi/deleteGoogleEvent";
 
 interface EventsState{
     events: Event[];
@@ -167,6 +168,40 @@ const eventsSlice = createSlice({
             });
             
         }, 
+        setUpdateGoogleEvent(state, action){
+            const allDay = action.payload.checkAllDay;
+            const updatedEvent = action.payload;
+            //設定使用者的時區
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            state.events = state.events.map(event => {
+                if(event.id === updatedEvent.id){
+                    if(allDay){
+                        return{
+                            ...event, 
+                            start: { date: updatedEvent.start},
+                            end: { date: updatedEvent.end},
+                            summary: updatedEvent.title,
+                            description: updatedEvent.description,
+                            project: updatedEvent.project
+
+                        }
+                    }else{
+                        const formattedStartDateTime = new Date(updatedEvent.start).toISOString();
+                        const formattedEndDateTime = new Date(updatedEvent.end).toISOString();
+                        return {
+                            ...event,
+                            start: { dateTime: formattedStartDateTime, timeZone: userTimeZone },
+                            end: { dateTime: formattedEndDateTime, timeZone: userTimeZone },
+                            summary: updatedEvent.title,
+                            description: updatedEvent.description,
+                            project: updatedEvent.project
+                        };
+                    }
+                    
+                }
+                return event;
+            });
+        },
         setAddEvent(state, action){
             state.events = action.payload ? [...state.events, ...action.payload] : state.events;
             state.loading = false;
@@ -177,6 +212,11 @@ const eventsSlice = createSlice({
             state.loading = false;
             console.log('更新的事件',action.payload )
             console.log('所有的事件被觸發', state.events)
+        },
+        setDeleteGoogleEvent(state, action){
+            const deletedEventId = action.payload;
+            state.events = state.events.filter(event => event.id !== deletedEventId);
+      
         },
         setCalendars(state, action) {
         state.calendars = action.payload || state.calendars;
@@ -218,4 +258,4 @@ const eventsSlice = createSlice({
 })
 
 export default eventsSlice.reducer;
-export const { setGoogleEvents, setCalendars, setLoading, setUpdateEventDrug,setAddEvent } = eventsSlice.actions;
+export const { setGoogleEvents,setUpdateGoogleEvent, setDeleteGoogleEvent ,setCalendars, setLoading, setUpdateEventDrug,setAddEvent } = eventsSlice.actions;

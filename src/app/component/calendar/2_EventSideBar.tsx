@@ -15,7 +15,7 @@ import { AppDispatch } from '@/store'
 import { addProjects, fetchProjects } from '@/features/projectsSlice';
 import { settingGoogleEvents } from './gapi/2_settingGoogleEvents';
 import { gapi } from 'gapi-script';
-import { setAddEvent, setGoogleEvents } from '@/features/eventsSlice';
+import { setAddEvent, setGoogleEvents, setUpdateEventDrug, setUpdateGoogleEvent, updateLocalEvent } from '@/features/eventsSlice';
 
 
 interface EventSideBarProps{
@@ -119,13 +119,13 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
             setEnd(selectedEndTime || '');
             setCheckAllDay(allDay);
             setCalendar("primary");
-            setDescription(selectedEvent.description || '');
+            setDescription(selectedEvent.extendedProps.description || '');
             setOptionCalendar(selectedCalendar||'')
             setProject(selectedProject || '');
             setProjectId(selectedProjectId||'');
             setOptionProject(selectedProjectId || '');
             setGoogleCalendars(calendars||[]);
-            setEventType(selectedEvent.taskType)
+            setEventType(selectedEvent.extendedProps.taskType)
         //如果沒有的話設定選到的時間
         }else if(selectedStartTime){
             let endDateTime = selectedEndTime ? selectedEndTime : selectedStartTime;
@@ -150,61 +150,39 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
 
     //新增到google calendar上
     const handleSave = async() => {
-        const newEventData : Event ={
-            title : title || '', 
-            start, 
-            end, 
-            checkAllDay, 
-            calendar: calendar || 'default', 
-            description, 
-            newProject, 
-            id: selectedEventId? selectedEventId : null
-        };
-        const endTimeSet = end.slice(0,10);
-        const project = projects.find((proj) => proj.id === newProject);
-        const projectTitle = project ? project.projectTitle : '';
+        if(selectedEventId){//如果選到既有的event的話
+            //先分辨其為google還是locol event
+            //googleEvent
+            console.log('確認一下這例',selectedEvent.extendedProps.taskType)
+            if(eventType == 'googleEvent'){
+                const projectId = selectedProjectId? selectedProjectId: newProject;
+                const updatedEventData  ={
+                    title : title || '', 
+                    start, 
+                    end, 
+                    checkAllDay, 
+                    calendar: calendar || 'default', 
+                    description, 
+                    projectId: projectId, 
+                    id: selectedEventId? selectedEventId : null
+                };
 
-        try{
-            //先確認有沒有連到google calendar
-            const googleToken = Cookies.get('googleToken');
-            if(googleToken){
-                await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
-                //將資料傳給google
-                const addedEvent = await addEventToGoogleCalendar(newEventData);
-                
-                if(addedEvent){
-                    if(addedEvent.checkAllDay){
-                        const allGoogleEvents  = [{
-                        ...addedEvent,
-                        id: addedEvent.id,
-                        start: { date: start},
-                        end: { date: end},
-                        color: addedEvent.backgroundColor,
-                        taskType: 'googleEvent',
-                        }];
-                        dispatch(setGoogleEvents(allGoogleEvents));
-                    }else{
-                        console.log('asldkfjalsdfj;alsdkjf', addedEvent.id)
-                        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                        const formattedStartDateTime = new Date(start).toISOString();
-                        const formattedEndDateTime = new Date(end).toISOString();
-                        const allGoogleEvents  = [{
-                            ...JSON.parse(JSON.stringify(addedEvent)),
-                            id: addedEvent.id,
-                            start: { dateTime: formattedStartDateTime, timeZone: userTimeZone },
-                            end: { dateTime: formattedEndDateTime, timeZone: userTimeZone },
-                            color: addedEvent.backgroundColor,
-                            taskType: 'googleEvent',
-                        }];
-                        dispatch(setGoogleEvents(allGoogleEvents));
-                    }
-                    
-                    
-                }
-            }else{
-                console.log('without google calendar auth, save in local');
-                const newEventRef = doc(collection(db, `event/${currentUser?.uid}/event`))
-                await setDoc(newEventRef,{
+                const updatedEvent = await addEventToGoogleCalendar(updatedEventData);
+
+                if(updatedEvent)(
+                    dispatch(setUpdateGoogleEvent(updatedEventData))
+                )
+
+            }
+            //task
+            else if(eventType == 'task'){
+                return;
+            }
+            //localEvent
+            else{
+                const eventId = selectedEventId;
+                const eventDef = doc(db, `event/${currentUser?.uid}/event`,selectedEventId)
+                const updatedlocalEventData = {
                     title: title || '',
                     start: start,
                     end: end,
@@ -214,32 +192,113 @@ const EventSideBar:React.FC<EventSideBarProps> = ({
                     projectTitle: '',
                     projectId: newProject || '',
                     createdAt: new Date().toISOString()
-                })
-                const localEvent = [{
-                    title: title || '',
-                    start: start,
-                    end: end,
-                    checkAllDay: checkAllDay,
-                    description: description || '',
-                    taskStatus: 'Unstarted',
-                    projectTitle: projectTitle||'',
-                    projectId: newProject || '',
-                    createdAt: new Date().toISOString(),
-                    taskType: 'event',
-                    id: newEventRef.id,
-                }];
-                dispatch(setAddEvent(localEvent));
-
+                }
+                try{
+                    dispatch(updateLocalEvent({eventDef,updatedlocalEventData,eventId}))
+                    
+                }catch(error){
+                    console.log('更新localEvent時出錯????',error);
+                }
             }
 
+            
 
 
-            //儲存資料後關閉視窗
-            onClose();
-
-        }catch(error){
-            console.log('新增日曆時出錯',error);
+        }else{
+            const newEventData : Event ={
+                title : title || '', 
+                start, 
+                end, 
+                checkAllDay, 
+                calendar: calendar || 'default', 
+                description, 
+                newProject, 
+                id: selectedEventId? selectedEventId : null
+            };
+            console.log('id',selectedEventId)
+            const endTimeSet = end.slice(0,10);
+            const project = projects.find((proj) => proj.id === newProject);
+            const projectTitle = project ? project.projectTitle : '';
+    
+            try{
+                //先確認有沒有連到google calendar
+                const googleToken = Cookies.get('googleToken');
+                if(googleToken){
+                    await AddorEditProjectTask({ projectId, newProject, title, endTimeSet,calendarId,currentUser })
+                    //將資料傳給google
+                    const addedEvent = await addEventToGoogleCalendar(newEventData);
+                    
+                    if(addedEvent){
+                        if(addedEvent.checkAllDay){
+                            const allGoogleEvents  = [{
+                            ...addedEvent,
+                            id: addedEvent.id,
+                            start: { date: start},
+                            end: { date: end},
+                            color: addedEvent.backgroundColor,
+                            taskType: 'googleEvent',
+                            }];
+                            dispatch(setGoogleEvents(allGoogleEvents));
+                        }else{
+                            console.log('asldkfjalsdfj;alsdkjf', addedEvent.id)
+                            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            const formattedStartDateTime = new Date(start).toISOString();
+                            const formattedEndDateTime = new Date(end).toISOString();
+                            const allGoogleEvents  = [{
+                                ...JSON.parse(JSON.stringify(addedEvent)),
+                                id: addedEvent.id,
+                                start: { dateTime: formattedStartDateTime, timeZone: userTimeZone },
+                                end: { dateTime: formattedEndDateTime, timeZone: userTimeZone },
+                                color: addedEvent.backgroundColor,
+                                taskType: 'googleEvent',
+                            }];
+                            dispatch(setGoogleEvents(allGoogleEvents));
+                        }
+                        
+                        
+                    }
+                }else{
+                    console.log('without google calendar auth, save in local');
+                    const newEventRef = doc(collection(db, `event/${currentUser?.uid}/event`))
+                    await setDoc(newEventRef,{
+                        title: title || '',
+                        start: start,
+                        end: end,
+                        checkAllDay: checkAllDay,
+                        description: description || '',
+                        taskStatus: 'Unstarted',
+                        projectTitle: '',
+                        projectId: newProject || '',
+                        createdAt: new Date().toISOString()
+                    })
+                    const localEvent = [{
+                        title: title || '',
+                        start: start,
+                        end: end,
+                        checkAllDay: checkAllDay,
+                        description: description || '',
+                        taskStatus: 'Unstarted',
+                        projectTitle: projectTitle||'',
+                        projectId: newProject || '',
+                        createdAt: new Date().toISOString(),
+                        taskType: 'event',
+                        id: newEventRef.id,
+                    }];
+                    dispatch(setAddEvent(localEvent));
+    
+                }
+    
+    
+    
+                //儲存資料後關閉視窗
+                onClose();
+    
+            }catch(error){
+                console.log('新增日曆時出錯',error);
+            }
         }
+        
+        
 
     };
 

@@ -89,6 +89,7 @@ async function readGoogleEvents(gapi: any) {
         const colorTypeEvents = events.map((event: any) => ({
           ...event,
           color: calendar.backgroundColor,
+          description: event.description,
           taskType: 'googleEvent',
         }));
   
