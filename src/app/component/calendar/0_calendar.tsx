@@ -376,6 +376,7 @@ const CalendarComponent = () =>{
                         taskId:event.taskId,
                         color:event.backgroundColor,
                         completed:event.completed,
+                        description:event.description
                     }
                 }
                 

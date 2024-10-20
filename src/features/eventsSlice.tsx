@@ -14,6 +14,7 @@ import { useAuth } from "@/app/component/auth/authContext";
 import { fetchProjects } from "./projectsSlice";
 import { Event } from "@/types/types";
 import { deleteGoogleEvent } from "@/app/component/calendar/gapi/deleteGoogleEvent";
+import TaskListDescription from "@/app/component/todolist/2_taskListDescription";
 
 interface EventsState{
     events: Event[];
@@ -76,6 +77,7 @@ export const fetchLocalEvents = createAsyncThunk('events/fetchLocalEvents',
             allDay: true,
             backgroundColor: doc.taskStatus === 'Done' ? '#d2c4b995' : '#C07767',
             calendarType: '',
+            description: doc.taskDescription,
             completed: doc.taskStatus === 'Done'? true:false,
         }))
 
